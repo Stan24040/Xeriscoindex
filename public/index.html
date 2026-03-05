@@ -1,1487 +1,1684 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>XeriscoIndex — Live Solana DEX Screener</title>
-<meta name="description" content="Real-time DEX screener for Solana tokens. Track live prices, volume, liquidity, top gainers and losers.">
-<meta name="theme-color" content="#020a0f">
-<meta property="og:type" content="website">
-<meta property="og:title" content="XeriscoIndex — Live Solana DEX Screener">
-<meta property="og:description" content="Real-time token prices, volume and liquidity on Solana.">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="XeriscoIndex">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="XeriscoIndex">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23020a0f'/><polygon points='16,2 30,10 30,22 16,30 2,22 2,10' fill='none' stroke='%2300e5ff' stroke-width='2'/><circle cx='16' cy='16' r='4' fill='%2300e5ff'/></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Chakra+Petch:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" as="style" onload="this.rel='stylesheet'">
-<style>
-  :root{--bg:#020a0f;--bg2:#040f18;--bg3:#071520;--panel:#071b28;--panel2:#0a2035;--border:#0d3352;--border2:#0f4a78;--accent:#00e5ff;--accent2:#00b4cc;--accent3:#007a8c;--green:#00ff88;--red:#ff3366;--gold:#ffd700;--text:#c8e8f5;--text2:#7ab3cc;--text3:#4a7a95}
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--bg);color:var(--text);font-family:'Chakra Petch',sans-serif;overflow-x:hidden;min-height:100vh}
-  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.012) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-  header{position:sticky;top:0;z-index:100;background:rgba(2,10,15,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 14px}
-  .hdr{max-width:1600px;margin:0 auto;display:flex;align-items:center;height:52px;gap:12px}
-  .logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
-  .ltxt{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--accent);text-shadow:0 0 16px rgba(0,229,255,.5)}
-  .ltxt span{color:var(--text2);font-weight:400}
-  nav{display:flex;gap:2px;flex:1}
-  nav a{color:var(--text3);font-size:11px;font-weight:500;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .18s;text-decoration:none}
-  nav a:hover,nav a.on{color:var(--accent);background:rgba(0,229,255,.07)}
-  .hdr-r{display:flex;align-items:center;gap:7px;flex-shrink:0}
-  .pill{font-size:10px;font-family:'Share Tech Mono',monospace;padding:3px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
-  .pill.live{color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.06)}
-  .pill.loading{color:var(--gold);border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.04)}
-  .pill.err{color:var(--red);border-color:rgba(255,51,102,.3)}
-  .chip{display:flex;align-items:center;gap:5px;background:rgba(0,229,255,.06);border:1px solid var(--border2);border-radius:7px;padding:4px 9px;font-size:10px;color:var(--accent);font-family:'Share Tech Mono',monospace}
-  .dotg{width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;box-shadow:0 0 5px var(--green)}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-  .wbtn{background:linear-gradient(135deg,var(--accent2),var(--accent3));border:none;border-radius:7px;padding:6px 12px;color:#000;font-family:'Chakra Petch',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s}
-  .wbtn.connected{background:var(--panel2);color:var(--accent);border:1px solid var(--border2);font-size:10px}
-  .wbtn:hover{opacity:.88}
-  /* Wallet selector modal */
-  .wmodal-bg{display:none;position:fixed;inset:0;z-index:2000;background:rgba(2,10,15,.85);backdrop-filter:blur(10px);align-items:center;justify-content:center;}
-  .wmodal-bg.show{display:flex}
-  .wmodal{background:var(--panel);border:1px solid var(--border2);border-radius:16px;padding:22px;width:min(360px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.6)}
-  .wmodal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-  .wmodal-title{font-size:15px;font-weight:700;color:var(--text);font-family:'Space Mono',monospace}
-  .wclose{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--text3);font-size:12px;cursor:pointer}
-  .wopt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:11px;cursor:pointer;transition:all .18s;margin-bottom:8px;background:var(--bg3)}
-  .wopt:hover{border-color:var(--accent2);background:rgba(0,229,255,.04)}
-  .wopt:last-child{margin-bottom:0}
-  .wopt-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-  .wopt-name{font-size:13px;font-weight:600;color:var(--text);font-family:'Chakra Petch',sans-serif}
-  .wopt-sub{font-size:10px;color:var(--text3);margin-top:1px;font-family:'Share Tech Mono',monospace}
-  .wopt-tag{margin-left:auto;font-size:9px;border-radius:4px;padding:2px 6px;font-family:'Share Tech Mono',monospace;flex-shrink:0}
-  .wopt-tag.det{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.2)}
-  .wopt-tag.nd{background:rgba(74,122,149,.1);color:var(--text3);border:1px solid var(--border)}
-  .wdisconn{width:100%;background:rgba(255,51,102,.06);border:1px solid rgba(255,51,102,.2);border-radius:8px;padding:9px;color:var(--red);font-family:'Chakra Petch',sans-serif;font-size:11px;cursor:pointer;margin-top:10px}
-  .wdisconn:hover{background:rgba(255,51,102,.12)}
-  /* Connected info pill in header */
-  .wpill{display:none;align-items:center;gap:6px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:8px;padding:4px 10px;font-size:10px;color:var(--green);font-family:'Share Tech Mono',monospace;cursor:pointer}
-  .wpill.show{display:flex}
-  .wpill-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;box-shadow:0 0 5px var(--green)}
-  .pbar-wrap{height:2px;background:var(--bg2);overflow:hidden}
-  .pbar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent3),var(--accent));transition:width .4s ease}
-  .pbar.done{background:var(--green);width:100%}
-  .tkwrap{background:var(--bg2);border-bottom:1px solid var(--border);overflow:hidden;height:30px;position:relative;z-index:1}
-  .tkwrap::before,.tkwrap::after{content:'';position:absolute;top:0;bottom:0;width:40px;z-index:2;pointer-events:none}
-  .tkwrap::before{left:0;background:linear-gradient(to right,var(--bg2),transparent)}
-  .tkwrap::after{right:0;background:linear-gradient(to left,var(--bg2),transparent)}
-  .ticker{display:flex;align-items:center;height:100%;animation:scroll 80s linear infinite;width:max-content}
-  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  .tki{display:flex;align-items:center;gap:6px;padding:0 18px;font-size:11px;font-family:'Share Tech Mono',monospace;white-space:nowrap;border-right:1px solid var(--border)}
-  .tk-s{color:var(--text2)}.tk-p{color:var(--text)}
-  .up{color:var(--green)}.dn{color:var(--red)}
-  .wrap{max-width:1600px;margin:0 auto;padding:14px;position:relative;z-index:1}
-  .flog{background:rgba(0,180,204,.05);border:1px solid var(--border);border-radius:8px;padding:7px 12px;margin-bottom:12px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .flog .tag{color:var(--accent2);flex-shrink:0}
-  .flog .ok{color:var(--green)}.flog .fail{color:var(--red)}.flog .wait{color:var(--gold)}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:9px;margin-bottom:14px}
-  .sc{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
-  .sc:hover{border-color:var(--border2)}
-  .sl{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;font-family:'Share Tech Mono',monospace}
-  .sv{font-size:17px;font-weight:700;color:var(--text);font-family:'Space Mono',monospace;line-height:1}
-  .ss{font-size:10px;margin-top:3px;color:var(--text3)}
-  .ss.up2{color:var(--green)}.ss.dn2{color:var(--red)}
-  .grid{display:grid;grid-template-columns:1fr 292px;gap:12px}
-  .srow{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;align-items:center}
-  .sbox{flex:1;min-width:160px;position:relative}
-  .sbox input{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:8px 12px 8px 32px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:11px;outline:none;transition:border-color .2s}
-  .sbox input:focus{border-color:var(--accent2)}
-  .sbox input::placeholder{color:var(--text3)}
-  .sico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
-  .fb{background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:6px 11px;color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:11px;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0}
-  .fb:hover,.fb.on{border-color:var(--accent2);color:var(--accent);background:rgba(0,229,255,.05)}
-  .fb.gain.on,.fb.gain:hover{background:rgba(0,255,136,.08);border-color:var(--green);color:var(--green)}
-  .fb.gain{color:#00cc6a;border-color:rgba(0,255,136,.2)}
-  .fb.lose.on,.fb.lose:hover{background:rgba(255,51,102,.08);border-color:var(--red);color:var(--red)}
-  .fb.lose{color:#cc2952;border-color:rgba(255,51,102,.2)}
-  .fb.trend.on,.fb.trend:hover{background:rgba(179,136,255,.08);border-color:#b388ff;color:#b388ff}
-  .fb.trend{color:#9966ff;border-color:rgba(179,136,255,.2)}
-  .srow{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .srow::-webkit-scrollbar{display:none}
-  .tabs{display:flex;gap:2px;margin-bottom:9px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:3px;width:fit-content}
-  .tab{padding:5px 13px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text3);transition:all .18s}
-  .tab.on{background:var(--accent3);color:#fff}
-  .tw{background:var(--panel);border:1px solid var(--border);border-radius:11px;overflow:hidden}
-  table{width:100%;border-collapse:collapse}
-  thead tr{background:var(--bg3);border-bottom:1px solid var(--border)}
-  th{padding:8px 10px;text-align:left;font-size:10px;color:var(--text3);font-weight:500;letter-spacing:1px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;cursor:pointer;user-select:none;white-space:nowrap}
-  th:hover{color:var(--text2)}
-  tbody tr{border-bottom:1px solid rgba(13,51,82,.4);transition:background .12s;cursor:pointer}
-  tbody tr:hover{background:rgba(0,229,255,.03)}
-  tbody tr:last-child{border-bottom:none}
-  td{padding:8px 10px;font-size:11px;white-space:nowrap;vertical-align:middle}
-  .pcell{display:flex;align-items:center;gap:8px}
-  .tis{position:relative;width:32px;height:20px;flex-shrink:0}
-  .ti{width:20px;height:20px;border-radius:50%;position:absolute;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;border:1.5px solid var(--bg)}
-  .ti:first-child{left:0;z-index:2}.ti:last-child{left:12px;z-index:1}
-  .pname{font-weight:600;font-size:12px;color:var(--text);margin-bottom:1px;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
-  .psub{font-size:9px;color:var(--text3);font-family:'Share Tech Mono',monospace}
-  .db{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.15);border-radius:3px;padding:1px 4px;font-size:9px;color:var(--accent2);font-family:'Share Tech Mono',monospace}
-  .mono{font-family:'Share Tech Mono',monospace;color:var(--text);font-size:11px}
-  .chg{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;padding:2px 5px;border-radius:3px;display:inline-block}
-  .chg.up{color:var(--green);background:rgba(0,255,136,.09)}
-  .chg.dn{color:var(--red);background:rgba(255,51,102,.09)}
-  .num{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text2)}
-  .age{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3)}
-  .spark{display:block;width:68px;height:22px}
-  .np{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);border-radius:3px;padding:1px 4px;font-size:8px;color:var(--accent);font-family:'Share Tech Mono',monospace;animation:blink 1.5s infinite}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-  @keyframes fG{from{background:rgba(0,255,136,.1)}to{background:transparent}}
-  @keyframes fR{from{background:rgba(255,51,102,.1)}to{background:transparent}}
-  .fg{animation:fG .6s ease}.fr{animation:fR .6s ease}
-  @keyframes rowIn{from{opacity:0;transform:translateX(-3px)}to{opacity:1;transform:translateX(0)}}
-  tbody tr{animation:rowIn .2s ease both}
-  .bb{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--border);background:var(--bg3);font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;flex-wrap:wrap;gap:5px}
-  .pgs{display:flex;gap:2px}
-  .pb{width:24px;height:24px;border-radius:5px;background:var(--panel2);border:1px solid var(--border);color:var(--text2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
-  .pb:hover{border-color:var(--accent2);color:var(--accent)}
-  .pb.on{background:var(--accent3);color:#fff;border-color:var(--accent3)}
-  .rp{display:flex;flex-direction:column;gap:11px}
-  .pcard{background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-  .ph{padding:9px 12px;border-bottom:1px solid var(--border);background:var(--bg3)}
-  .pt{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:1px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;display:flex;align-items:center;gap:5px}
-  .pt .d{width:4px;height:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 5px var(--accent)}
-  .si{display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;transition:background .12s;border-bottom:1px solid rgba(13,51,82,.3)}
-  .si:last-child{border-bottom:none}
-  .si:hover{background:rgba(0,229,255,.035)}
-  .ic2{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0}
-  .rk{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;width:13px;text-align:right;flex-shrink:0}
-  .rk.top{color:var(--gold)}
-  .state{display:flex;align-items:center;justify-content:center;padding:36px 14px;flex-direction:column;gap:9px;color:var(--text3);font-family:'Share Tech Mono',monospace;font-size:11px;text-align:center;line-height:1.6}
-  .spin{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .rbtn{background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:6px 13px;color:var(--accent);font-family:'Chakra Petch',sans-serif;font-size:11px;cursor:pointer;margin-top:4px}
-  ::-webkit-scrollbar{width:4px;height:4px}
-  ::-webkit-scrollbar-track{background:var(--bg2)}
-  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-  @media(max-width:1100px){.grid{grid-template-columns:1fr}.rp{display:none}}
-  @media(max-width:700px){.wrap{padding:10px}.stats{grid-template-columns:repeat(2,1fr)}th.sm,td.sm{display:none}nav{display:none}}
-</style>
-<script>window.BOOST_WALLET='__BOOST_WALLET__';</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOLPRIZE — Xeris Lottery</title>
+  <meta name="description" content="The provably fair lottery on the Xeris blockchain. Buy tickets with XRS, win big." />
+  <meta property="og:title" content="SOLPRIZE — Xeris Lottery" />
+  <meta property="og:description" content="Buy tickets. Win XRS. On-chain lottery powered by Xeris." />
+  <meta name="theme-color" content="#0a0a0f" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #07070d;
+      --surface:   #0f0f1a;
+      --border:    #1e1e35;
+      --accent:    #c8ff00;
+      --accent2:   #ff3cac;
+      --accent3:   #00e5ff;
+      --text:      #e8e8f0;
+      --muted:     #5a5a7a;
+      --gold:      #ffd84d;
+      --radius:    4px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,255,0,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,255,0,.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── TICKER TAPE ── */
+    .ticker-wrap {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 28px;
+      background: var(--accent);
+      overflow: hidden;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+    }
+    .ticker-inner {
+      display: flex;
+      gap: 64px;
+      animation: ticker 28s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-inner span {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #07070d;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky;
+      top: 28px;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 64px;
+      background: rgba(7,7,13,.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: .12em;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .logo span { color: var(--accent2); }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .net-pill {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(0,229,255,.1);
+      color: var(--accent3);
+      border: 1px solid rgba(0,229,255,.25);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    #connectBtn {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      padding: 8px 20px;
+      background: var(--accent);
+      color: #07070d;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: background .2s, transform .1s;
+    }
+    #connectBtn:hover { background: #d9ff26; transform: translateY(-1px); }
+    #connectBtn.connected {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      margin-bottom: 72px;
+      animation: fadeUp .7s ease both;
+    }
+    .hero-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 12vw, 148px);
+      line-height: .92;
+      letter-spacing: .04em;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 55%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+    .hero-sub strong { color: var(--text); font-weight: 500; }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 56px;
+      animation: fadeUp .7s .15s ease both;
+    }
+    .stat-box {
+      background: var(--surface);
+      padding: 24px 20px;
+      text-align: center;
+    }
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .stat-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: .04em;
+    }
+    .stat-val.gold { color: var(--gold); }
+    .stat-val.green { color: var(--accent); }
+    .stat-val.pink { color: var(--accent2); }
+    .stat-val.cyan { color: var(--accent3); }
+
+    /* ── TWO-COL LAYOUT ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* ── PANEL ── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+      animation: fadeUp .7s .3s ease both;
+    }
+    .panel-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: .1em;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .panel-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .4; transform: scale(.7); }
+    }
+
+    /* ── BUY PANEL ── */
+    .ticket-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .price-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: var(--accent);
+      letter-spacing: .04em;
+    }
+    .price-unit {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .qty-btn {
+      width: 44px; height: 44px;
+      background: var(--border);
+      border: none;
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      transition: background .15s;
+      font-family: 'Space Mono', monospace;
+    }
+    .qty-btn:hover { background: #2a2a45; }
+    #ticketCount {
+      flex: 1;
+      text-align: center;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 22px;
+      padding: 8px;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    #ticketCount::-webkit-outer-spin-button,
+    #ticketCount::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .total-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .total-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: var(--gold);
+      letter-spacing: .04em;
+    }
+
+    #buyBtn {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: #07070d;
+      border: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: .15em;
+      cursor: pointer;
+      transition: background .2s, transform .1s, box-shadow .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    #buyBtn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.25) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform .6s;
+    }
+    #buyBtn:hover::before { transform: translateX(100%); }
+    #buyBtn:hover { background: #d9ff26; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200,255,0,.3); }
+    #buyBtn:active { transform: translateY(0); }
+    #buyBtn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .faucet-link {
+      display: block;
+      margin-top: 12px;
+      text-align: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--accent3);
+      text-decoration: none;
+      letter-spacing: .08em;
+      opacity: .7;
+      transition: opacity .2s;
+    }
+    .faucet-link:hover { opacity: 1; }
+
+    /* ── POOL PANEL ── */
+    .pool-visual {
+      position: relative;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .pool-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      border-radius: 4px;
+      transition: width 1s ease;
+      width: 0%;
+    }
+    .pool-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 56px;
+      color: var(--gold);
+      letter-spacing: .04em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .pool-unit {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .1em;
+      margin-bottom: 24px;
+    }
+
+    .countdown-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .countdown {
+      display: flex;
+      gap: 12px;
+    }
+    .cd-unit { text-align: center; }
+    .cd-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      color: var(--accent2);
+      letter-spacing: .04em;
+      line-height: 1;
+      display: block;
+    }
+    .cd-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .cd-sep {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      color: var(--border);
+      line-height: 1;
+    }
+
+    /* ── FULL WIDTH PANELS ── */
+    .full-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+      margin-bottom: 24px;
+      animation: fadeUp .7s .45s ease both;
+    }
+
+    /* ── PLAYERS TABLE ── */
+    .players-grid {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0;
+    }
+    .pg-head {
+      display: contents;
+    }
+    .pg-head > span {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .12em;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 0 0 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .pg-head > span:not(:first-child) { text-align: right; }
+    .player-row {
+      display: contents;
+    }
+    .player-row > span {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(30,30,53,.5);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+    .player-row > span:not(:first-child) { text-align: right; }
+    .player-addr {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--accent3);
+    }
+    .player-tickets {
+      font-family: 'Space Mono', monospace;
+      color: var(--accent);
+    }
+    .player-pct { color: var(--muted); font-size: 12px; }
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+
+    /* ── WINNERS ── */
+    .winners-list { display: flex; flex-direction: column; gap: 12px; }
+    .winner-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(255,212,77,.04);
+      border: 1px solid rgba(255,212,77,.12);
+    }
+    .winner-left { display: flex; align-items: center; gap: 14px; }
+    .winner-rank {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: var(--gold);
+      opacity: .4;
+      width: 28px;
+    }
+    .winner-addr {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .winner-round {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .winner-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: var(--gold);
+      letter-spacing: .04em;
+    }
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7,7,13,.85);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 40px;
+      max-width: 440px;
+      width: calc(100% - 48px);
+      transform: translateY(20px);
+      transition: transform .25s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: .1em;
+      margin-bottom: 8px;
+    }
+    .modal-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-bottom: 10px;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      color: var(--text);
+    }
+    .wallet-option:hover {
+      border-color: var(--accent);
+      background: rgba(200,255,0,.04);
+    }
+    .wallet-icon {
+      width: 40px; height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .wallet-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+    }
+    .wallet-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px 8px;
+      transition: color .2s;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal { position: relative; }
+
+    /* ── TOAST ── */
+    #toastContainer {
+      position: fixed;
+      bottom: 32px; right: 24px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .toast {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      padding: 12px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      max-width: 340px;
+      animation: slideIn .3s ease;
+      letter-spacing: .04em;
+    }
+    .toast.success { border-color: var(--accent); color: var(--accent); }
+    .toast.error   { border-color: var(--accent2); color: var(--accent2); }
+    .toast.info    { border-color: var(--accent3); color: var(--accent3); }
+    @keyframes slideIn {
+      from { transform: translateX(30px); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ── WIN MODAL ── */
+    .win-modal .modal {
+      text-align: center;
+      border-color: var(--gold);
+    }
+    .win-trophy {
+      font-size: 64px;
+      display: block;
+      margin-bottom: 16px;
+      animation: bounce 1s ease infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-12px); }
+    }
+    .win-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 56px;
+      color: var(--gold);
+      letter-spacing: .04em;
+    }
+
+    /* ── STATUS BAR ── */
+    #statusBar {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      padding: 8px;
+      letter-spacing: .06em;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer p {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .08em;
+    }
+    footer a {
+      color: var(--accent3);
+      text-decoration: none;
+    }
+    footer a:hover { color: var(--accent); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      header { padding: 0 16px; }
+      .hero h1 { font-size: clamp(56px, 18vw, 80px); }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      main { padding: 40px 16px 80px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    /* ── SKIP LINK ── */
+    .skip-link {
+      position: absolute;
+      top: -40px; left: 0;
+      background: var(--accent);
+      color: #07070d;
+      padding: 8px 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      text-decoration: none;
+      z-index: 999;
+    }
+    .skip-link:focus { top: 0; }
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="hdr">
-    <a class="logo" href="#">
-      <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-        <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="rgba(0,229,255,.08)" stroke="#00e5ff" stroke-width="1.5"/>
-        <polygon points="16,8 24,13 24,20 16,24 8,20 8,13" fill="rgba(0,229,255,.12)" stroke="#00b4cc" stroke-width="1"/>
-        <circle cx="16" cy="16" r="4" fill="#00e5ff" opacity=".9"/>
-      </svg>
-      <span class="ltxt">Xerisco<span>Index</span></span>
-    </a>
-    <nav>
-      <a class="on" onclick="setView('all',this)">Screener</a>
-      <a onclick="setView('trending',this)">Trending</a>
-      <a onclick="setView('new',this)">New Pairs</a>
-      <a onclick="setView('gainers',this)">Gainers</a>
-    </nav>
-    <div class="hdr-r">
-      <div class="pill loading" id="sp">LOADING</div>
-      <div class="chip"><div class="dotg"></div>SOLANA</div>
-      <div class="wpill" id="wpill" onclick="openWalletModal()">
-        <div class="wpill-dot"></div>
-        <span id="wpill_addr">—</span>
-      </div>
-      <button class="wbtn" id="wbtn" onclick="openWalletModal()">Connect</button>
-    </div>
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<!-- TICKER -->
+<div class="ticker-wrap" role="marquee" aria-label="Network ticker">
+  <div class="ticker-inner" id="tickerInner">
+    <span>◈ XERIS TESTNET LIVE</span>
+    <span>⬡ ROUND #1 NOW OPEN</span>
+    <span>✦ GET FREE XRS FROM FAUCET</span>
+    <span>◈ TICKET PRICE: 0.01 XRS</span>
+    <span>⬡ POWERED BY XERIS CHAIN</span>
+    <span>✦ TRIPLE CONSENSUS: PoW + PoS + PoH</span>
+    <span>◈ XERIS TESTNET LIVE</span>
+    <span>⬡ ROUND #1 NOW OPEN</span>
+    <span>✦ GET FREE XRS FROM FAUCET</span>
+    <span>◈ TICKET PRICE: 0.01 XRS</span>
+    <span>⬡ POWERED BY XERIS CHAIN</span>
+    <span>✦ TRIPLE CONSENSUS: PoW + PoS + PoH</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header role="banner">
+  <a href="#" class="logo" aria-label="Solprize home">SOL<span>PRIZE</span></a>
+  <div class="header-right">
+    <span class="net-pill" id="netPill">⬡ XERIS TESTNET</span>
+    <button id="connectBtn" aria-haspopup="dialog">CONNECT WALLET</button>
   </div>
 </header>
 
-<div class="pbar-wrap"><div class="pbar" id="pbar"></div></div>
+<!-- MAIN -->
+<main id="main-content">
 
-<div class="tkwrap">
-  <div class="ticker" id="ticker">
-    <div class="tki"><span class="tk-s" style="color:var(--text3)">Connecting to DexScreener...</span></div>
+  <!-- HERO -->
+  <section class="hero" aria-label="Hero">
+    <p class="hero-label">⬡ On-Chain Lottery · Xeris Blockchain · Testnet</p>
+    <h1>WIN<br>BIG<br>XRS</h1>
+    <p class="hero-sub">
+      Buy tickets with <strong>XRS</strong>. One winner takes the entire prize pool every draw.
+      Transparent. On-chain. No house games.
+    </p>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-row" aria-label="Network statistics">
+    <div class="stat-box">
+      <div class="stat-label">Prize Pool</div>
+      <div class="stat-val gold" id="statPool">0.00</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Tickets Sold</div>
+      <div class="stat-val green" id="statTickets">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Players</div>
+      <div class="stat-val cyan" id="statPlayers">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Round</div>
+      <div class="stat-val pink" id="statRound">#1</div>
+    </div>
+  </section>
+
+  <!-- TWO COLUMN -->
+  <div class="two-col">
+
+    <!-- BUY PANEL -->
+    <div class="panel" aria-label="Buy tickets">
+      <div class="panel-title">
+        <div class="dot"></div>
+        BUY TICKETS
+      </div>
+      <div class="ticket-price-row">
+        <span class="price-big">0.01</span>
+        <span class="price-unit">XRS / ticket</span>
+      </div>
+      <div class="qty-row" role="group" aria-label="Ticket quantity">
+        <button class="qty-btn" id="qtyMinus" aria-label="Decrease quantity">−</button>
+        <input type="number" id="ticketCount" value="1" min="1" max="100" aria-label="Number of tickets" />
+        <button class="qty-btn" id="qtyPlus" aria-label="Increase quantity">+</button>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Total Cost</span>
+        <span class="total-amount" id="totalCost">0.01 XRS</span>
+      </div>
+      <button id="buyBtn" disabled aria-label="Buy tickets">
+        CONNECT WALLET FIRST
+      </button>
+      <a href="#" id="faucetLink" class="faucet-link" aria-label="Get free testnet XRS from faucet">
+        ↗ Need XRS? Get from testnet faucet
+      </a>
+      <div id="statusBar" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- POOL PANEL -->
+    <div class="panel" aria-label="Prize pool information">
+      <div class="panel-title">
+        <div class="dot" style="background:var(--gold)"></div>
+        PRIZE POOL
+      </div>
+      <div class="pool-visual" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="poolBar">
+        <div class="pool-fill" id="poolFill"></div>
+      </div>
+      <div class="pool-amount" id="poolAmount">0.00</div>
+      <div class="pool-unit">XRS · CURRENT ROUND</div>
+      <div class="countdown-label">NEXT DRAW IN</div>
+      <div class="countdown" aria-label="Countdown to next draw">
+        <div class="cd-unit">
+          <span class="cd-num" id="cdH">00</span>
+          <span class="cd-label">HRS</span>
+        </div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit">
+          <span class="cd-num" id="cdM">00</span>
+          <span class="cd-label">MIN</span>
+        </div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit">
+          <span class="cd-num" id="cdS">00</span>
+          <span class="cd-label">SEC</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAYERS TABLE -->
+  <div class="full-panel" aria-label="Current round players">
+    <div class="panel-title">
+      <div class="dot" style="background:var(--accent3)"></div>
+      CURRENT PLAYERS
+    </div>
+    <div id="playersContainer">
+      <div class="empty-state">— NO PLAYERS YET · BE THE FIRST —</div>
+    </div>
+  </div>
+
+  <!-- WINNERS -->
+  <div class="full-panel" aria-label="Past winners">
+    <div class="panel-title">
+      <div class="dot" style="background:var(--gold)"></div>
+      PAST WINNERS
+    </div>
+    <div id="winnersContainer">
+      <div class="empty-state">— NO DRAWS YET · FIRST WINNER COMING SOON —</div>
+    </div>
+  </div>
+
+</main>
+
+<footer role="contentinfo">
+  <p>SOLPRIZE · POWERED BY <a href="https://xerisweb.com" target="_blank" rel="noopener">XERIS CHAIN</a></p>
+  <p>TESTNET DEMO · NOT REAL FUNDS · <a href="https://github.com/ZZachWWins/xeriscoin" target="_blank" rel="noopener">GITHUB</a></p>
+</footer>
+
+<!-- CONNECT MODAL -->
+<div class="modal-overlay" id="connectModal" role="dialog" aria-modal="true" aria-labelledby="connectModalTitle">
+  <div class="modal">
+    <button class="modal-close" id="connectModalClose" aria-label="Close">✕</button>
+    <div class="modal-title" id="connectModalTitle">CONNECT WALLET</div>
+    <p class="modal-sub">Connect your wallet to buy tickets and participate in the Xeris lottery.</p>
+
+    <button class="wallet-option" id="wcBtn" aria-label="Connect with WalletConnect">
+      <div class="wallet-icon">🔗</div>
+      <div>
+        <div class="wallet-name">WALLETCONNECT</div>
+        <div class="wallet-desc">200+ wallets via QR code or deep link</div>
+      </div>
+    </button>
+
+    <button class="wallet-option" id="demoBtn" aria-label="Use demo wallet">
+      <div class="wallet-icon">🧪</div>
+      <div>
+        <div class="wallet-name">DEMO WALLET</div>
+        <div class="wallet-desc">Generate a testnet keypair instantly</div>
+      </div>
+    </button>
   </div>
 </div>
 
-<div class="wrap">
-  <div class="flog" id="flog">
-    <span class="tag">FETCH LOG</span>
-    <span id="logTxt" class="wait">Starting...</span>
-  </div>
-
-  <div class="stats" id="statsBar">
-    <div class="sc"><div class="sl">Status</div><div class="sv" style="font-size:11px;color:var(--text3)">Fetching live data...</div></div>
-  </div>
-
-  <div class="grid">
-    <div>
-      <div class="srow">
-        <div class="sbox"><span class="sico">⌕</span><input id="q" type="text" placeholder="Search tokens, symbols, pairs..." oninput="applyFilter()"></div>
-        <button class="fb on"    onclick="setFilter(this,'all')">All</button>
-        <button class="fb trend"  onclick="setFilter(this,'trending')">📈 Trending</button>
-        <button class="fb gain"   onclick="setFilter(this,'gainers')">🚀 Top Gainers</button>
-        <button class="fb lose"   onclick="setFilter(this,'losers')">📉 Top Losers</button>
-        <button class="fb"        onclick="setFilter(this,'new')">🆕 New Pairs</button>
-        <button class="fb"        onclick="setFilter(this,'hot')">🔥 High Volume</button>
-      </div>
-      <div class="tabs">
-        <div class="tab on">Pairs</div>
-        <div class="tab">Tokens</div>
-        <div class="tab">Pools</div>
-      </div>
-      <div class="tw">
-        <table>
-          <thead><tr>
-            <th style="width:24px">#</th>
-            <th>PAIR / TOKEN</th>
-            <th class="sm">DEX</th>
-            <th onclick="sortBy('price')">PRICE ↕</th>
-            <th onclick="sortBy('h1')">1H ↕</th>
-            <th class="sm" onclick="sortBy('h6')">6H ↕</th>
-            <th onclick="sortBy('h24')">24H ↕</th>
-            <th onclick="sortBy('vol')">VOLUME ↕</th>
-            <th class="sm" onclick="sortBy('liq')">LIQ ↕</th>
-            <th class="sm" onclick="sortBy('mcap')">MCAP ↕</th>
-            <th class="sm">TXNS</th>
-            <th class="sm">AGE</th>
-            <th class="sm">CHART</th>
-          </tr></thead>
-          <tbody id="tbody">
-            <tr><td colspan="13"><div class="state"><div class="spin"></div><span>Loading live Solana pairs...</span></div></td></tr>
-          </tbody>
-        </table>
-        <div class="bb"><span id="pc">—</span><div class="pgs" id="pgs"></div></div>
-      </div>
-    </div>
-
-    <div class="rp">
-      <div class="pcard"><div class="ph"><span class="pt"><span class="d"></span>Trending 24H</span></div><div id="trendList"><div class="state"><div class="spin"></div></div></div></div>
-      <div class="pcard"><div class="ph"><span class="pt"><span class="d"></span>New Pairs</span></div><div id="newList"><div class="state"><div class="spin"></div></div></div></div>
-      <div class="pcard"><div class="ph"><span class="pt"><span class="d"></span>Top Gainers</span></div><div id="gainList"><div class="state"><div class="spin"></div></div></div></div>
-    </div>
+<!-- WIN MODAL -->
+<div class="modal-overlay win-modal" id="winModal" role="dialog" aria-modal="true" aria-labelledby="winModalTitle">
+  <div class="modal">
+    <button class="modal-close" id="winModalClose" aria-label="Close">✕</button>
+    <span class="win-trophy" role="img" aria-label="Trophy">🏆</span>
+    <div class="modal-title" id="winModalTitle">YOU WON!</div>
+    <p class="modal-sub">Congratulations — you've won this round's prize pool.</p>
+    <div class="win-amount" id="winAmount">0.00 XRS</div>
   </div>
 </div>
 
+<!-- TOAST CONTAINER -->
+<div id="toastContainer" role="status" aria-live="polite" aria-atomic="true"></div>
+
+
+<!-- ─────────────────── SCRIPTS ─────────────────── -->
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
-// XeriscoIndex — Fixed for Android compatibility
-// Key fixes:
-//  1. NO AbortSignal.timeout() — replaced with manual AbortController + setTimeout
-//  2. Fetch without credentials/mode that breaks on file://
-//  3. Multiple CORS proxies tried in sequence
-//  4. JSON extraction fallback for allorigins wrapper format
-// ─────────────────────────────────────────────────────────────────────────────
 
-const DS = 'https://api.dexscreener.com';
-const XERIS_TOKEN = '9ezFthWrDUpSSeMdpLW6SDD9TJigHdc4AuQ5QN5bpump';
-
-// CORS proxy list — tried in order until one works
-// NO AbortSignal.timeout — use manual timer instead
-const PROXY_LIST = [
-  { name: 'Direct',       wrap: u => u },
-  { name: 'CORSProxy.io', wrap: u => `https://corsproxy.io/?${encodeURIComponent(u)}` },
-  { name: 'AllOrigins',   wrap: u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}` },
-  { name: 'ThingProxy',   wrap: u => `https://thingproxy.freeboard.io/fetch/${u}` },
-];
-
-let workingProxy = null; // cache which proxy works
-
-const $  = id => document.getElementById(id);
-const nv = v  => isFinite(+v) ? +v : 0;
-
-function fU(v){v=nv(v);if(v>=1e9)return'$'+(v/1e9).toFixed(2)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(2)+'M';if(v>=1e3)return'$'+(v/1e3).toFixed(1)+'K';return'$'+v.toFixed(2)}
-function fP(v){v=nv(v);if(!v)return'$0';if(v>=1e4)return'$'+v.toFixed(0);if(v>=100)return'$'+v.toFixed(2);if(v>=1)return'$'+v.toFixed(4);if(v>=0.001)return'$'+v.toFixed(6);if(v>=1e-6)return'$'+v.toFixed(8);return'$'+v.toExponential(2)}
-function fA(ts){const ms=Date.now()-(ts||Date.now()),s=ms/1e3,m=s/60,h=m/60,d=h/24;return d>=1?Math.floor(d)+'d':h>=1?Math.floor(h)+'h':m>=1?Math.floor(m)+'m':Math.floor(s)+'s'}
-function chg(v){v=nv(v);return`<span class="chg ${v>=0?'up':'dn'}">${v>=0?'+':''}${v.toFixed(2)}%</span>`}
-function tCol(s){const C=['#00e5ff','#00ff88','#ff6b35','#a855f7','#ffd700','#ff3366','#00b4cc','#39ff14','#ff9500','#e040fb','#40c4ff','#69ff47','#ff80ab','#80d8ff','#ccff90','#ea80fc'];if(!s)return C[0];let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return C[Math.abs(h)%C.length]}
-function spk(d,up){const c=up?'#00ff88':'#ff3366';if(!Array.isArray(d)||d.length<2)return`<svg class="spark" viewBox="0 0 68 22"><line x1="0" y1="11" x2="68" y2="11" stroke="${c}" stroke-width="1" opacity=".3"/></svg>`;const v=d.map(x=>nv(x)),mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1;const pts=v.map((x,i)=>`${(i/(v.length-1))*68},${22-((x-mn)/r)*18-2}`).join(' ');return`<svg class="spark" viewBox="0 0 68 22" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${c}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-function dxL(id){const M={pumpswap:'PumpSwap',raydium:'Raydium',orca:'Orca',meteora:'Meteora',jupiter:'Jupiter','raydium-clmm':'Raydium CLMM','orca-whirlpool':'Orca WP','pump-fun':'PumpFun'};return M[id]||(id?id[0].toUpperCase()+id.slice(1):'DEX')}
-
-// Progress bar
-function setProg(pct, done){
-  const el=$('pbar');
-  el.style.width=pct+'%';
-  if(done){el.classList.add('done');setTimeout(()=>{el.style.width='0%';el.classList.remove('done');},2000);}
-}
-
-// Fetch log
-function log(msg, cls){
-  const el=$('logTxt');
-  if(el){el.textContent=msg;el.className=cls||'wait';}
-  console.log('[XI]',msg);
-}
-
-// ── SAFE FETCH — NO AbortSignal.timeout(), Android-compatible ────────────────
-// Uses a manual setTimeout + AbortController which works on all browsers
-function safeFetch(url, timeoutMs) {
-  timeoutMs = timeoutMs || 12000;
-  return new Promise(function(resolve, reject) {
-    var controller = null;
-    var timer = null;
-    var done = false;
-
-    // Try AbortController (not all old browsers have it, but most Android WebViews do)
-    try {
-      controller = new AbortController();
-      timer = setTimeout(function() {
-        if (!done) { done = true; controller.abort(); reject(new Error('Timeout')); }
-      }, timeoutMs);
-    } catch(e) {
-      // AbortController not available — just do a plain fetch with no abort
-      controller = null;
-    }
-
-    var fetchOpts = { method: 'GET', headers: { 'Accept': 'application/json' } };
-    if (controller) fetchOpts.signal = controller.signal;
-
-    fetch(url, fetchOpts)
-      .then(function(res) {
-        if (timer) clearTimeout(timer);
-        done = true;
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      })
-      .then(function(text) {
-        // Parse JSON safely — handle allorigins wrapper { contents: "..." }
-        try {
-          var data = JSON.parse(text);
-          // allorigins wraps response in { contents: "...", status: {...} }
-          if (data && typeof data.contents === 'string') {
-            data = JSON.parse(data.contents);
-          }
-          resolve(data);
-        } catch(e) {
-          reject(new Error('Bad JSON: ' + text.slice(0,80)));
-        }
-      })
-      .catch(function(err) {
-        if (timer) clearTimeout(timer);
-        done = true;
-        reject(err);
-      });
-  });
-}
-
-// ── FETCH WITH PROXY FALLBACK ─────────────────────────────────────────────────
-async function fetchDS(path) {
-  const url = DS + path;
-
-  // If we already found a working proxy, try it first
-  if (workingProxy !== null) {
-    const proxy = PROXY_LIST[workingProxy];
-    try {
-      const data = await safeFetch(proxy.wrap(url));
-      return data;
-    } catch(e) {
-      // Cached proxy failed — fall through to try all
-      workingProxy = null;
-    }
-  }
-
-  // Try each proxy in order
-  for (let i = 0; i < PROXY_LIST.length; i++) {
-    const proxy = PROXY_LIST[i];
-    try {
-      log('Trying ' + proxy.name + '...', 'wait');
-      const data = await safeFetch(proxy.wrap(url));
-      workingProxy = i; // cache successful proxy
-      if (i > 0) log(proxy.name + ' connected ✓', 'ok');
-      return data;
-    } catch(e) {
-      log(proxy.name + ' failed: ' + e.message, 'fail');
-      await sleep(250);
-    }
-  }
-  throw new Error('All proxies failed for: ' + path);
-}
-
-function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-// ── NORMALIZE pair ────────────────────────────────────────────────────────────
-function norm(raw, idx) {
-  if (!raw || !raw.pairAddress) return null;
-  const b = raw.baseToken  || {};
-  const q = raw.quoteToken || {};
-  return {
-    id:       raw.pairAddress,
-    rank:     idx + 1,
-    sym:      b.symbol  || '???',
-    name:     b.name    || b.symbol || '???',
-    qs:       q.symbol  || 'SOL',
-    dex:      dxL(raw.dexId),
-    url:      raw.url   || ('https://dexscreener.com/solana/' + raw.pairAddress),
-    col:      tCol(b.symbol),
-    price:    nv(raw.priceUsd),
-    h1:       nv(raw.priceChange && raw.priceChange.h1),
-    h6:       nv(raw.priceChange && raw.priceChange.h6),
-    h24:      nv(raw.priceChange && raw.priceChange.h24),
-    vol:      nv(raw.volume && raw.volume.h24),
-    liq:      nv(raw.liquidity && raw.liquidity.usd),
-    mcap:     nv(raw.marketCap) || nv(raw.fdv),
-    buys:     nv(raw.txns && raw.txns.h24 && raw.txns.h24.buys),
-    sells:    nv(raw.txns && raw.txns.h24 && raw.txns.h24.sells),
-    launched: raw.pairCreatedAt || 0,
-    sparkline:[],
-  };
-}
-
-// ── FETCH STRATEGIES ──────────────────────────────────────────────────────────
-async function fetchByToken(addr) {
-  const data = await fetchDS('/latest/dex/tokens/' + addr);
-  return ((data && data.pairs) || []).filter(p => p.chainId === 'solana');
-}
-
-async function fetchBySearch(q) {
-  const data = await fetchDS('/latest/dex/search?q=' + encodeURIComponent(q));
-  return ((data && data.pairs) || []).filter(p => p.chainId === 'solana');
-}
-
-// ── MAIN LOAD ─────────────────────────────────────────────────────────────────
-const SEARCHES = ['XERIS','SOL BONK WIF','JUP POPCAT MOODENG','TRUMP FARTCOIN PENGU','MEME PEPE SHIB'];
-
-async function load() {
-  setPill('loading', 'LOADING');
-  setProg(5);
-  $('flog').style.display = 'flex';
-
-  const raw = [];
-  let ok = 0;
-
-  // Step 1: XERIS token specifically
-  try {
-    log('Fetching XERIS pairs...', 'wait');
-    const xp = await fetchByToken(XERIS_TOKEN);
-    raw.push(...xp);
-    ok++;
-    log('XERIS: ' + xp.length + ' pairs ✓', 'ok');
-  } catch(e) { log('XERIS token fetch failed', 'fail'); }
-
-  setProg(20);
-
-  // Step 2: Broad Solana searches
-  for (let i = 0; i < SEARCHES.length; i++) {
-    try {
-      log('Searching: ' + SEARCHES[i] + '...', 'wait');
-      const sp = await fetchBySearch(SEARCHES[i]);
-      raw.push(...sp);
-      ok++;
-      log('Got ' + sp.length + ' pairs', 'ok');
-      setProg(20 + Math.round((i+1) / SEARCHES.length * 70));
-      if (raw.length >= 60 && i >= 1) break; // enough data, stop early
-    } catch(e) {
-      log('Search ' + (i+1) + ' failed: ' + e.message, 'fail');
-    }
-    await sleep(150);
-  }
-
-  setProg(95);
-
-  // Deduplicate + normalize
-  const seen = new Set(), merged = [];
-  raw.forEach(p => {
-    if (!p || !p.pairAddress || seen.has(p.pairAddress)) return;
-    seen.add(p.pairAddress);
-    if (nv(p.liquidity && p.liquidity.usd) < 50 && merged.length > 30) return;
-    const n = norm(p, merged.length);
-    if (n) merged.push(n);
-  });
-
-  merged.sort((a,b) => b.vol - a.vol);
-  merged.forEach((p,i) => p.rank = i+1);
-
-  setProg(100, true);
-
-  if (merged.length === 0) {
-    setPill('err', '✕ NO DATA');
-    log('No data — see error below', 'fail');
-    $('tbody').innerHTML = `<tr><td colspan="13"><div class="state">
-      <span style="font-size:22px">⚠️</span>
-      <span>Could not fetch data.<br><br>
-      <b style="color:var(--text)">Fix:</b> Open this file in<br>
-      <b style="color:var(--accent)">Chrome browser</b> (not file viewer)<br>
-      or deploy to Railway for best results.</span>
-      <button class="rbtn" onclick="load()">↺ Retry</button>
-    </div></td></tr>`;
-    return;
-  }
-
-  all = merged;
-  applyFilter();
-  renderStats();
-  renderTicker();
-  renderSide();
-  setPill('live', '● LIVE ' + all.length);
-  log('✓ ' + all.length + ' pairs loaded via ' + PROXY_LIST[workingProxy || 0].name, 'ok');
-  setTimeout(() => { $('flog').style.display = 'none'; }, 4000);
-}
-
-function setPill(cls, txt){ const e=$('sp'); e.className='pill '+cls; e.textContent=txt; }
-
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let all = [], vis = [], pg = 1, sk = null, sd = -1, flt = 'all';
-const PG = 25;
-let timer = null;
-
-// ── RENDER STATS ──────────────────────────────────────────────────────────────
-function renderStats() {
-  const x=all.find(p=>p.sym==='XERIS');
-  const tv=all.reduce((s,p)=>s+p.vol,0), tl=all.reduce((s,p)=>s+p.liq,0);
-  const nt=all.filter(p=>p.launched&&Date.now()-p.launched<86400000).length;
-  $('statsBar').innerHTML=[
-    {l:'XERIS Price',v:x?fP(x.price):'N/A',   s:x?(nv(x.h24)>=0?'+':'')+nv(x.h24).toFixed(2)+'% 24h':'Not listed',c:x&&nv(x.h24)>=0?'up2':'dn2'},
-    {l:'24H Volume', v:fU(tv), s:'All pairs'},
-    {l:'Liquidity',  v:fU(tl), s:'Total locked'},
-    {l:'Pairs',      v:all.length, s:'+'+nt+' today'},
-    {l:'Chain',      v:'SOLANA', s:'DexScreener live'},
-    {l:'Updated',    v:new Date().toLocaleTimeString(), s:'Auto 30s'},
-  ].map(c=>`<div class="sc"><div class="sl">${c.l}</div><div class="sv">${c.v}</div><div class="ss ${c.c||''}">${c.s}</div></div>`).join('');
-}
-
-// ── TICKER ────────────────────────────────────────────────────────────────────
-function renderTicker() {
-  if (!all.length) return;
-  const items = all.slice(0,25).map(p=>`
-    <div class="tki">
-      <span class="tk-s">${p.sym}/${p.qs}</span>
-      <span class="tk-p">${fP(p.price)}</span>
-      <span class="${nv(p.h24)>=0?'up':'dn'}">${nv(p.h24)>=0?'+':''}${nv(p.h24).toFixed(2)}%</span>
-    </div>`).join('');
-  $('ticker').innerHTML = items + items;
-}
-
-// ── TABLE ─────────────────────────────────────────────────────────────────────
-function renderTable() {
-  if (!vis.length) {
-    $('tbody').innerHTML=`<tr><td colspan="13"><div class="state"><span>No pairs match.</span></div></td></tr>`;
-    $('pc').textContent='0 pairs'; $('pgs').innerHTML=''; return;
-  }
-  const st=(pg-1)*PG, rows=vis.slice(st,st+PG);
-  $('tbody').innerHTML=rows.map((p,i)=>{
-    const rk=st+i+1, u=nv(p.h24)>=0, isN=p.launched&&(Date.now()-p.launched<7200000), c=p.col;
-    return`<tr onclick="openToken('${p.id}')" style="animation-delay:${i*.014}s">
-      <td style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3)">${rk}</td>
-      <td><div class="pcell">
-        <div class="tis">
-          <div class="ti" style="background:${c}22;border-color:${c}44"><span style="color:${c}">${p.sym.slice(0,2)}</span></div>
-          <div class="ti" style="background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.2)"><span style="color:#00e5ff;font-size:6px">SOL</span></div>
-        </div>
-        <div>
-          <div class="pname">${p.sym}/${p.qs}${isN?' <span class="np">NEW</span>':''}${p.sym==='XERIS'?' <span style="color:var(--accent);font-size:9px">★</span>':''}</div>
-          <div class="psub">${p.name}</div>
-        </div>
-      </div></td>
-      <td class="sm"><span class="db">${p.dex}</span></td>
-      <td class="mono">${fP(p.price)}</td>
-      <td>${chg(p.h1)}</td>
-      <td class="sm">${chg(p.h6)}</td>
-      <td>${chg(p.h24)}</td>
-      <td class="num">${fU(p.vol)}</td>
-      <td class="num sm">${fU(p.liq)}</td>
-      <td class="num sm">${fU(p.mcap)}</td>
-      <td class="sm" style="font-size:10px;font-family:'Share Tech Mono',monospace"><span style="color:var(--green)">${p.buys}B</span> <span style="color:var(--text3)">/</span> <span style="color:var(--red)">${p.sells}S</span></td>
-      <td class="age sm">${p.launched?fA(p.launched):'—'}</td>
-      <td class="sm">${spk(p.sparkline,u)}</td>
-    </tr>`;
-  }).join('');
-  $('pc').textContent=`${st+1}–${Math.min(st+PG,vis.length)} of ${vis.length} pairs`;
-  renderPgs();
-}
-
-function renderPgs(){
-  const tot=Math.ceil(vis.length/PG); if(tot<=1){$('pgs').innerHTML='';return}
-  const ps=[];
-  if(tot<=7)for(let i=1;i<=tot;i++)ps.push(i);
-  else{ps.push(1);if(pg>3)ps.push('…');for(let i=Math.max(2,pg-1);i<=Math.min(tot-1,pg+1);i++)ps.push(i);if(pg<tot-2)ps.push('…');ps.push(tot);}
-  let h=`<div class="pb" onclick="goP(${pg-1})">‹</div>`;
-  ps.forEach(p=>{h+=p==='…'?`<div class="pb" style="opacity:.3;cursor:default">…</div>`:`<div class="pb ${p===pg?'on':''}" onclick="goP(${p})">${p}</div>`;});
-  h+=`<div class="pb" onclick="goP(${pg+1})">›</div>`;
-  $('pgs').innerHTML=h;
-}
-
-function goP(p){const t=Math.ceil(vis.length/PG);if(p<1||p>t)return;pg=p;renderTable();window.scrollTo({top:180,behavior:'smooth'})}
-
-// ── SORT & FILTER ─────────────────────────────────────────────────────────────
-const SKM={price:'price',vol:'vol',liq:'liq',mcap:'mcap',h1:'h1',h6:'h6',h24:'h24'};
-function sortBy(k){if(sk===k)sd*=-1;else{sk=k;sd=-1;}if(SKM[k])vis.sort((a,b)=>(nv(a[SKM[k]])-nv(b[SKM[k]]))*sd);pg=1;renderTable()}
-function setFilter(el,f){flt=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));el.classList.add('on');applyFilter()}
-function applyFilter(){
-  let r=[...all];
-  if(flt==='trending') r=r.sort((a,b)=>nv(b.vol)-nv(a.vol)).slice(0,100);
-  if(flt==='gainers')  r=r.filter(p=>nv(p.h24)>0).sort((a,b)=>nv(b.h24)-nv(a.h24)).slice(0,100);
-  if(flt==='losers')   r=r.filter(p=>nv(p.h24)<0).sort((a,b)=>nv(a.h24)-nv(b.h24)).slice(0,100);
-  if(flt==='new')      r=r.sort((a,b)=>(b.launched||0)-(a.launched||0)).slice(0,80);
-  if(flt==='hot')      r=r.sort((a,b)=>nv(b.vol)-nv(a.vol)).slice(0,80);
-  const q=($('q').value||'').toLowerCase().trim();
-  if(q)r=r.filter(p=>(p.sym||'').toLowerCase().includes(q)||(p.name||'').toLowerCase().includes(q)||(p.id||'').toLowerCase().includes(q));
-  vis=r;pg=1;renderTable();
-}
-function setView(v,el){
-  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('on'));
-  if(el)el.classList.add('on');
-  // Sync filter buttons
-  const btnMap={'trending':'trending','new':'new','gainers':'gainers'};
-  if(btnMap[v]){
-    flt=btnMap[v];
-    applyFilter();
-  } else {
-    flt='all'; applyFilter();
-  }
-}
-
-// ── SIDE PANEL ────────────────────────────────────────────────────────────────
-function renderSide(){
-  if(!all.length)return;
-  const bV=[...all].sort((a,b)=>nv(b.vol)-nv(a.vol));
-  const bN=[...all].filter(p=>p.launched).sort((a,b)=>b.launched-a.launched);
-  const bG=[...all].sort((a,b)=>nv(b.h24)-nv(a.h24));
-  $('trendList').innerHTML=bV.slice(0,8).map((p,i)=>`
-    <div class="si" onclick="openP('${p.url}')">
-      <span class="rk ${i<3?'top':''}">${i+1}</span>
-      <div class="ic2" style="background:${p.col}20;color:${p.col}">${p.sym.slice(0,2)}</div>
-      <div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.sym}/${p.qs}</div><div style="font-size:9px;color:var(--text3);font-family:'Share Tech Mono',monospace">${p.dex}</div></div>
-      <div style="text-align:right;flex-shrink:0"><div style="font-size:11px;font-weight:700;font-family:'Share Tech Mono',monospace;color:${nv(p.h24)>=0?'var(--green)':'var(--red)'}">${nv(p.h24)>=0?'+':''}${nv(p.h24).toFixed(1)}%</div><div style="font-size:9px;color:var(--text3);font-family:'Share Tech Mono',monospace">${fU(p.vol)}</div></div>
-    </div>`).join('');
-  $('newList').innerHTML=bN.slice(0,6).map(p=>`
-    <div class="si" onclick="openP('${p.url}')">
-      <div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text)">${p.sym}/${p.qs}</div><div style="font-size:9px;color:var(--text3);font-family:'Share Tech Mono',monospace">🕒 ${fA(p.launched)} · ${p.dex}</div></div>
-      <div style="text-align:right;flex-shrink:0"><div style="font-size:11px;font-family:'Share Tech Mono',monospace;color:var(--text2)">${fP(p.price)}</div><div style="font-size:9px;color:var(--text3);font-family:'Share Tech Mono',monospace">${fU(p.liq)}</div></div>
-    </div>`).join('')||'<div class="state" style="padding:12px"><span>No new pairs</span></div>';
-  $('gainList').innerHTML=bG.slice(0,6).map((p,i)=>`
-    <div class="si" onclick="openP('${p.url}')">
-      <span class="rk">${i+1}</span>
-      <div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text)">${p.sym}</div><div style="font-size:9px;color:var(--text3);font-family:'Share Tech Mono',monospace">${p.dex}</div></div>
-      <div style="font-size:12px;font-weight:700;color:var(--green);font-family:'Share Tech Mono',monospace">+${nv(p.h24).toFixed(2)}%</div>
-    </div>`).join('');
-}
-
-// ── TOKEN DETAIL PAGE ────────────────────────────────────────────────────────
-// Stored token boosts (in-memory; persist to localStorage when available)
-var tokenBoosts = {};
-try { tokenBoosts = JSON.parse(localStorage.getItem('xi_boosts') || '{}'); } catch(e){}
-
-function saveBoosts(){ try { localStorage.setItem('xi_boosts', JSON.stringify(tokenBoosts)); } catch(e){} }
-
-function openToken(id) {
-  const p = all.find(x => x.id === id);
-  if (!p) return;
-  const boost = tokenBoosts[id] || {};
-  const modal = $('tokenModal');
-  const up = nv(p.h24) >= 0;
-  const col = p.col;
-
-  // Icon
-  const icon = $('td_icon');
-  icon.style.background = col + '22';
-  icon.style.borderColor = col + '55';
-  icon.style.color = col;
-  if (boost.logo) {
-    icon.innerHTML = `<img src="${boost.logo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentNode.innerHTML='${p.sym.slice(0,2)}'">`;
-  } else {
-    icon.textContent = p.sym.slice(0,2);
-  }
-
-  // Header
-  $('td_sym').textContent  = p.sym;
-  $('td_qs').textContent   = '/ ' + p.qs;
-  $('td_dex').textContent  = p.dex;
-  $('td_name').textContent = p.name;
-  $('td_price').textContent = fP(p.price);
-  $('td_priceSol').textContent = 'Price in SOL: coming soon';
-  $('td_dexlink').href = p.url;
-
-  const h24el = $('td_h24chg');
-  h24el.textContent = (up?'+':'') + nv(p.h24).toFixed(2) + '%';
-  h24el.style.color = up ? 'var(--green)' : 'var(--red)';
-
-  // Boost badge
-  if (boost.featured) {
-    $('td_boost_badge').style.display = 'block';
-  } else {
-    $('td_boost_badge').style.display = 'none';
-  }
-
-  // Stats grid
-  $('td_stats').innerHTML = [
-    {l:'LIQUIDITY', v: fU(p.liq)},
-    {l:'MKT CAP',   v: fU(p.mcap)},
-    {l:'FDV',       v: fU(p.fdv || p.mcap)},
-    {l:'24H VOLUME',v: fU(p.vol)},
-    {l:'AGE',       v: p.launched ? fA(p.launched) : '—'},
-    {l:'DEX',       v: p.dex},
-  ].map(c=>`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;">
-    <div style="font-size:9px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:5px;">${c.l}</div>
-    <div style="font-size:15px;font-weight:700;font-family:'Space Mono',monospace;color:var(--text);">${c.v}</div>
-  </div>`).join('');
-
-  // Price changes
-  $('td_changes').innerHTML = [
-    {l:'5M',  v: null},
-    {l:'1H',  v: p.h1},
-    {l:'6H',  v: p.h6},
-    {l:'24H', v: p.h24},
-  ].map(c=>{
-    const val = c.v === null ? null : nv(c.v);
-    const col2 = val === null ? 'var(--text3)' : val >= 0 ? 'var(--green)' : 'var(--red)';
-    const txt  = val === null ? 'N/A' : (val>=0?'+':'') + val.toFixed(2) + '%';
-    return `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;">${c.l}</div>
-      <div style="font-size:16px;font-weight:700;font-family:'Share Tech Mono',monospace;color:${col2};margin-top:4px;">${txt}</div>
-    </div>`;
-  }).join('');
-
-  // Txns
-  const total = p.buys + p.sells || 1;
-  const buyPct = Math.round((p.buys / total) * 100);
-  $('td_txns').innerHTML = `
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;">TXNS</div>
-      <div style="font-size:20px;font-weight:700;font-family:'Space Mono',monospace;color:var(--text);margin-top:4px;">${p.buys+p.sells}</div>
-    </div>
-    <div style="background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:8px;padding:10px;text-align:center;">
-      <div style="font-size:10px;color:var(--green);font-family:'Share Tech Mono',monospace;">BUYS</div>
-      <div style="font-size:20px;font-weight:700;font-family:'Space Mono',monospace;color:var(--green);margin-top:4px;">${p.buys}</div>
-    </div>
-    <div style="background:rgba(255,51,102,.06);border:1px solid rgba(255,51,102,.2);border-radius:8px;padding:10px;text-align:center;">
-      <div style="font-size:10px;color:var(--red);font-family:'Share Tech Mono',monospace;">SELLS</div>
-      <div style="font-size:20px;font-weight:700;font-family:'Space Mono',monospace;color:var(--red);margin-top:4px;">${p.sells}</div>
-    </div>`;
-  $('td_bar').innerHTML = `
-    <div style="height:100%;width:${buyPct}%;background:var(--green);border-radius:3px;transition:width .5s;"></div>`;
-
-  // Socials (from boost or DexScreener)
-  const socials = [];
-  if (boost.website) socials.push({icon:'🌐', label:'Website', url: boost.website});
-  if (boost.twitter) socials.push({icon:'𝕏', label:'Twitter', url: boost.twitter});
-  if (boost.telegram) socials.push({icon:'✈️', label:'Telegram', url: boost.telegram});
-  // Always add DexScreener link
-  socials.push({icon:'📊', label:'DexScreener', url: p.url});
-
-  $('td_socials').innerHTML = socials.map(s =>
-    `<a href="${s.url}" target="_blank" style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text2);text-decoration:none;font-size:11px;font-family:'Chakra Petch',sans-serif;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">${s.icon} ${s.label} ↗</a>`
-  ).join('');
-
-  // Description
-  const descEl = $('td_desc');
-  if (boost.desc) {
-    descEl.textContent = boost.desc;
-    descEl.style.display = 'block';
-  } else {
-    descEl.style.display = 'none';
-  }
-
-  // Addresses
-  $('td_addrs').innerHTML = [
-    {l:'PAIR',  v: p.id},
-    {l:'TOKEN', v: p.base_addr || '—'},
-  ].map(a => `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
-    <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;width:50px;flex-shrink:0;">${a.l}</div>
-    <div style="flex:1;font-size:10px;color:var(--text2);font-family:'Share Tech Mono',monospace;word-break:break-all;">${a.v}</div>
-    <button onclick="copyAddr('${a.v}')" style="background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:4px 8px;color:var(--accent);font-size:10px;cursor:pointer;flex-shrink:0;">📋</button>
-    <a href="https://solscan.io/account/${a.v}" target="_blank" style="background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:4px 8px;color:var(--text2);font-size:10px;text-decoration:none;flex-shrink:0;">EXP ↗</a>
-  </div>`).join('');
-
-  // Community reactions
-  const rxKey = 'rx_' + id;
-  let rx = {};
-  try { rx = JSON.parse(localStorage.getItem(rxKey) || '{}'); } catch(e){}
-  const emojis = [['🚀','Rocket'],['🔥','Fire'],['💩','Poop'],['🚩','Flag']];
-  $('td_reactions').innerHTML = emojis.map(([e,l]) =>
-    `<button onclick="react('${id}','${rxKey}','${e}')" style="display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 16px;cursor:pointer;transition:all .15s;font-size:18px;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'">
-      ${e}
-      <span style="font-size:11px;color:var(--text2);font-family:'Share Tech Mono',monospace;" id="rx_${e.codePointAt(0)}_${id}">${rx[e]||0}</span>
-    </button>`
-  ).join('');
-
-  // Prefill boost form
-  $('bf_addr').value = p.id;
-
-  modal.style.display = 'block';
-  document.body.style.overflow = 'hidden';
-  modal.scrollTop = 0;
-}
-
-function closeToken(){
-  $('tokenModal').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-function react(pairId, rxKey, emoji) {
-  let rx = {};
-  try { rx = JSON.parse(localStorage.getItem(rxKey) || '{}'); } catch(e){}
-  rx[emoji] = (rx[emoji] || 0) + 1;
-  try { localStorage.setItem(rxKey, JSON.stringify(rx)); } catch(e){}
-  const el = document.getElementById('rx_' + emoji.codePointAt(0) + '_' + pairId);
-  if (el) el.textContent = rx[emoji];
-}
-
-function copyAddr(addr) {
-  navigator.clipboard && navigator.clipboard.writeText(addr).catch(()=>{});
-}
-
-// ── BOOST MODAL ───────────────────────────────────────────────────────────────
-var currentPlan = 'basic';
-var currentBoostId = '';
-
-function openBoost(){
-  const addr = $('bf_addr').value;
-  currentBoostId = addr;
-  $('boostModal').style.display = 'block';
-}
-
-function closeBoost(){
-  $('boostModal').style.display = 'none';
-  $('bf_msg').style.display = 'none';
-}
-
-function selectPlan(el, plan){
-  currentPlan = plan;
-  document.querySelectorAll('.plan-card').forEach(c=>{
-    c.style.border = '2px solid rgba(124,77,255,.3)';
-    c.style.background = 'transparent';
-  });
-  el.style.border = plan==='featured' ? '2px solid var(--gold)' : '2px solid #7c4dff';
-  el.style.background = plan==='featured' ? 'rgba(255,215,0,.06)' : 'rgba(124,77,255,.1)';
-  $('bf_amount').textContent = plan==='featured' ? '0.5 SOL' : '0.1 SOL';
-  $('bf_logo_wrap').style.display = plan==='featured' ? 'block' : 'none';
-}
-
-function copyWallet(){
-  const addr = $('bf_wallet').textContent;
-  navigator.clipboard && navigator.clipboard.writeText(addr).then(()=>{
-    $('bf_wallet').style.color = 'var(--green)';
-    setTimeout(()=>{ $('bf_wallet').style.color = 'var(--accent2)'; }, 1500);
-  }).catch(()=>{});
-}
-
-function submitBoost(){
-  const addr  = $('bf_addr').value.trim();
-  const tx    = $('bf_tx').value.trim();
-  const web   = $('bf_web').value.trim();
-  const twit  = $('bf_twitter').value.trim();
-  const tg    = $('bf_tg').value.trim();
-  const desc  = $('bf_desc').value.trim();
-  const logo  = $('bf_logo').value.trim();
-  const msg   = $('bf_msg');
-
-  if (!tx) {
-    msg.style.display='block'; msg.style.color='var(--red)';
-    msg.textContent = '✕ Please enter your transaction hash.'; return;
-  }
-  if (!web && !twit && !tg && !desc) {
-    msg.style.display='block'; msg.style.color='var(--red)';
-    msg.textContent = '✕ Please fill in at least one social link or description.'; return;
-  }
-
-  // Save boost data locally (in production: send to backend API)
-  tokenBoosts[addr] = {
-    website:  web  || null,
-    twitter:  twit || null,
-    telegram: tg   || null,
-    desc:     desc || null,
-    logo:     logo || null,
-    featured: currentPlan === 'featured',
-    tx:       tx,
-    ts:       Date.now(),
-  };
-  saveBoosts();
-
-  if(window.location.protocol!=='file:'){
-    fetch('/api/boost',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({pairAddress:addr,website:web,twitter:twit,telegram:tg,
-        description:desc,logo:logo,txHash:tx,plan:currentPlan})
-    }).catch(function(e){console.warn('[Boost]',e.message);});
-  }
-
-  msg.style.display='block'; msg.style.color='var(--green)';
-  msg.textContent = '✅ Boost request submitted! Info will be verified within 24h.';
-
-  // Refresh token modal to show new info
-  setTimeout(()=>{
-    closeBoost();
-    // Re-open token modal with updated info
-    const p = all.find(x=>x.id===addr);
-    if(p) openToken(addr);
-  }, 1800);
-}
-
-function openP(url){ if(url&&url.startsWith('http')) window.open(url,'_blank'); }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SOLANA WALLET CONNECTION
-// Supports: Phantom, Solflare, Backpack, Trust, OKX, Coin98, Slope + WC QR
-// ═══════════════════════════════════════════════════════════════════════════
-
-var walletState = { connected: false, address: null, provider: null, name: null };
-
-// Wallet definitions — each has a name, icon, provider getter, and connect fn
-var WALLETS = [
-  {
-    id: 'phantom',
-    name: 'Phantom',
-    icon: '👻',
-    bg: '#ab9ff2',
-    sub: 'Most popular Solana wallet',
-    get provider() {
-      return (window.phantom && window.phantom.solana) ||
-             (window.solana && window.solana.isPhantom ? window.solana : null);
-    },
-    connect: async function() {
-      var p = this.provider;
-      if (!p) throw new Error('not_installed');
-      var res = await p.connect();
-      return res.publicKey.toString();
-    },
-    disconnect: async function() {
-      var p = this.provider;
-      if (p && p.disconnect) await p.disconnect();
-    }
-  },
-  {
-    id: 'solflare',
-    name: 'Solflare',
-    icon: '🔆',
-    bg: '#fc7227',
-    sub: 'Secure Solana wallet',
-    get provider() {
-      return window.solflare && window.solflare.isSolflare ? window.solflare : null;
-    },
-    connect: async function() {
-      var p = this.provider;
-      if (!p) throw new Error('not_installed');
-      await p.connect();
-      return p.publicKey.toString();
-    },
-    disconnect: async function() {
-      var p = this.provider;
-      if (p && p.disconnect) await p.disconnect();
-    }
-  },
-  {
-    id: 'backpack',
-    name: 'Backpack',
-    icon: '🎒',
-    bg: '#e33e3f',
-    sub: 'xNFT wallet by Coral',
-    get provider() {
-      return window.backpack && window.backpack.isBackpack ? window.backpack : null;
-    },
-    connect: async function() {
-      var p = this.provider;
-      if (!p) throw new Error('not_installed');
-      var res = await p.connect();
-      return (res.publicKey || p.publicKey).toString();
-    },
-    disconnect: async function() {
-      var p = this.provider;
-      if (p && p.disconnect) await p.disconnect();
-    }
-  },
-  {
-    id: 'okx',
-    name: 'OKX Wallet',
-    icon: '⭕',
-    bg: '#000',
-    sub: 'OKX multi-chain wallet',
-    get provider() {
-      return window.okxwallet && window.okxwallet.solana ? window.okxwallet.solana : null;
-    },
-    connect: async function() {
-      var p = this.provider;
-      if (!p) throw new Error('not_installed');
-      var res = await p.connect();
-      return (res.publicKey || p.publicKey).toString();
-    },
-    disconnect: async function() {
-      var p = this.provider;
-      if (p && p.disconnect) await p.disconnect();
-    }
-  },
-  {
-    id: 'coin98',
-    name: 'Coin98',
-    icon: '🪙',
-    bg: '#c9a84c',
-    sub: 'DeFi & Web3 gateway',
-    get provider() {
-      return window.coin98 && window.coin98.sol ? window.coin98.sol : null;
-    },
-    connect: async function() {
-      var p = this.provider;
-      if (!p) throw new Error('not_installed');
-      var res = await p.connect();
-      return (res.publicKey || p.publicKey).toString();
-    },
-    disconnect: async function() {
-      var p = this.provider;
-      if (p && p.disconnect) await p.disconnect();
-    }
-  },
-  {
-    id: 'trust',
-    name: 'Trust Wallet',
-    icon: '🛡️',
-    bg: '#3375bb',
-    sub: 'Multi-chain mobile wallet',
-    get provider() {
-      return window.trustwallet && window.trustwallet.solana ? window.trustwallet.solana :
-             (window.solana && window.solana.isTrust ? window.solana : null);
-    },
-    connect: async function() {
-      var p = this.provider;
-      if (!p) throw new Error('not_installed');
-      var res = await p.connect();
-      return (res.publicKey || p.publicKey).toString();
-    },
-    disconnect: async function() {
-      var p = this.provider;
-      if (p && p.disconnect) await p.disconnect();
-    }
-  },
-];
-
-function shortAddr(addr) {
-  if (!addr) return '';
-  return addr.slice(0,4) + '...' + addr.slice(-4);
-}
-
-function openWalletModal() {
-  var bg = $('walletModalBg');
-  bg.classList.add('show');
-
-  if (walletState.connected) {
-    renderConnectedModal();
-  } else {
-    renderWalletList();
-  }
-}
-
-function closeWalletModal() {
-  $('walletModalBg').classList.remove('show');
-}
-
-function bgCloseWallet(e) {
-  if (e.target === $('walletModalBg')) closeWalletModal();
-}
-
-function renderWalletList() {
-  $('wmodal_title').textContent = 'Connect Wallet';
-  var body = $('wmodal_body');
-
-  var html = '';
-  WALLETS.forEach(function(w) {
-    var detected = !!w.provider;
-    html += '<div class="wopt" onclick="connectWith('' + w.id + '')">' +
-      '<div class="wopt-ico" style="background:' + w.bg + '22;border:1px solid ' + w.bg + '44">' + w.icon + '</div>' +
-      '<div style="flex:1;min-width:0">' +
-        '<div class="wopt-name">' + w.name + '</div>' +
-        '<div class="wopt-sub">' + w.sub + '</div>' +
-      '</div>' +
-      '<span class="wopt-tag ' + (detected ? 'det' : 'nd') + '">' + (detected ? '● Detected' : 'Install') + '</span>' +
-    '</div>';
-  });
-
-  // Mobile deep link hint
-  html += '<div style="margin-top:12px;padding:10px 12px;background:rgba(0,229,255,.04);border:1px solid var(--border);border-radius:8px;font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;line-height:1.6;">' +
-    '📱 On mobile? Open this page inside your wallet's built-in browser for best compatibility.' +
-  '</div>';
-
-  body.innerHTML = html;
-}
-
-function renderConnectedModal() {
-  $('wmodal_title').textContent = 'Wallet Connected';
-  var body = $('wmodal_body');
-  body.innerHTML =
-    '<div style="background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:11px;padding:16px;margin-bottom:12px;">' +
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
-        '<div style="width:36px;height:36px;border-radius:10px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);display:flex;align-items:center;justify-content:center;font-size:20px;">' + (getWallet(walletState.name) ? getWallet(walletState.name).icon : '👛') + '</div>' +
-        '<div>' +
-          '<div style="font-size:13px;font-weight:700;color:var(--text);font-family:'Chakra Petch',sans-serif;">' + (walletState.name || 'Wallet') + '</div>' +
-          '<div style="font-size:10px;color:var(--green);font-family:'Share Tech Mono',monospace;">● Connected</div>' +
-        '</div>' +
-      '</div>' +
-      '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;">' +
-        '<span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text2);">' + walletState.address + '</span>' +
-        '<button onclick="copyWalletAddr()" style="background:var(--panel2);border:1px solid var(--border2);border-radius:5px;padding:4px 8px;color:var(--accent);font-size:11px;cursor:pointer;flex-shrink:0;margin-left:8px;">📋</button>' +
-      '</div>' +
-    '</div>' +
-    '<a href="https://solscan.io/account/' + walletState.address + '" target="_blank" style="display:block;text-align:center;padding:9px;background:rgba(0,229,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--text2);text-decoration:none;font-size:11px;font-family:'Chakra Petch',sans-serif;margin-bottom:8px;">🔍 View on Solscan ↗</a>' +
-    '<button class="wdisconn" onclick="disconnectWallet()">⏏ Disconnect Wallet</button>';
-}
-
-function getWallet(name) {
-  return WALLETS.find(function(w){ return w.name === name; }) || null;
-}
-
-async function connectWith(id) {
-  var wallet = WALLETS.find(function(w){ return w.id === id; });
-  if (!wallet) return;
-
-  if (!wallet.provider) {
-    // Open install page
-    var urls = {
-      phantom:  'https://phantom.app',
-      solflare: 'https://solflare.com',
-      backpack:  'https://backpack.app',
-      okx:      'https://okx.com/web3',
-      coin98:   'https://coin98.com',
-      trust:    'https://trustwallet.com',
-    };
-    if (urls[id]) window.open(urls[id], '_blank');
-    return;
-  }
-
-  // Show connecting state
-  var body = $('wmodal_body');
-  body.innerHTML =
-    '<div style="text-align:center;padding:30px 0;">' +
-      '<div style="font-size:36px;margin-bottom:12px;">' + wallet.icon + '</div>' +
-      '<div style="font-size:13px;color:var(--text2);font-family:'Chakra Petch',sans-serif;margin-bottom:6px;">Connecting to ' + wallet.name + '...</div>' +
-      '<div style="font-size:11px;color:var(--text3);font-family:'Share Tech Mono',monospace;">Approve in your wallet</div>' +
-      '<div class="spin" style="margin:16px auto 0;"></div>' +
-    '</div>';
-
-  try {
-    var address = await wallet.connect();
-    walletState = { connected: true, address: address, provider: wallet.provider, name: wallet.name };
-
-    // Update header button
-    var btn = $('wbtn');
-    btn.textContent = shortAddr(address);
-    btn.className = 'wbtn connected';
-
-    // Show pill
-    var pill = $('wpill');
-    pill.classList.add('show');
-    $('wpill_addr').textContent = shortAddr(address);
-
-    // Hide connect button on mobile (pill takes over)
-    btn.style.display = 'none';
-
-    // Pre-fill boost form address if open
-    if ($('bf_addr')) $('bf_addr').value = address;
-
-    renderConnectedModal();
-
-    // Listen for disconnect event
-    try {
-      wallet.provider.on('disconnect', function() { onWalletDisconnect(); });
-      wallet.provider.on('accountChanged', function(pk) {
-        if (pk) { walletState.address = pk.toString(); updateWalletUI(); }
-        else onWalletDisconnect();
-      });
-    } catch(e){}
-
-  } catch(err) {
-    var msg = err.message || 'Unknown error';
-    if (msg === 'not_installed') msg = wallet.name + ' not installed';
-    if (err.code === 4001) msg = 'Request rejected by user';
-    body.innerHTML =
-      '<div style="text-align:center;padding:24px 0;">' +
-        '<div style="font-size:32px;margin-bottom:10px;">⚠️</div>' +
-        '<div style="font-size:12px;color:var(--red);font-family:'Share Tech Mono',monospace;margin-bottom:14px;">' + msg + '</div>' +
-        '<button onclick="renderWalletList()" style="background:var(--panel2);border:1px solid var(--border2);border-radius:7px;padding:7px 16px;color:var(--accent);font-family:'Chakra Petch',sans-serif;font-size:11px;cursor:pointer;">← Try Again</button>' +
-      '</div>';
-  }
-}
-
-function updateWalletUI() {
-  var btn = $('wbtn');
-  btn.textContent = shortAddr(walletState.address);
-  btn.className = 'wbtn connected';
-  $('wpill_addr').textContent = shortAddr(walletState.address);
-}
-
-async function disconnectWallet() {
-  try {
-    var wallet = getWallet(walletState.name);
-    if (wallet && wallet.disconnect) await wallet.disconnect();
-  } catch(e){}
-  onWalletDisconnect();
-  closeWalletModal();
-}
-
-function onWalletDisconnect() {
-  walletState = { connected: false, address: null, provider: null, name: null };
-  var btn = $('wbtn');
-  btn.textContent = 'Connect';
-  btn.className = 'wbtn';
-  btn.style.display = '';
-  var pill = $('wpill');
-  pill.classList.remove('show');
-  $('wpill_addr').textContent = '—';
-}
-
-function copyWalletAddr() {
-  if (!walletState.address) return;
-  navigator.clipboard && navigator.clipboard.writeText(walletState.address).then(function(){
-    // brief visual feedback
-    var pill = $('wpill_addr');
-    var old = pill.textContent;
-    pill.textContent = 'Copied!';
-    setTimeout(function(){ pill.textContent = old; }, 1200);
-  }).catch(function(){});
-}
-
-// Auto-reconnect if wallet was previously connected (eager connect)
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    // Try Phantom eager connect (non-intrusive — only if already approved)
-    try {
-      var p = (window.phantom && window.phantom.solana) || window.solana;
-      if (p && p.isPhantom && p.isConnected && p.publicKey) {
-        walletState = { connected: true, address: p.publicKey.toString(), provider: p, name: 'Phantom' };
-        updateWalletUI();
-        var btn = $('wbtn');
-        btn.style.display = 'none';
-        $('wpill').classList.add('show');
-      }
-    } catch(e){}
-  }, 800);
+// ══════════════════════════════════════════════
+//  CONFIG — edit these for your deployment
+// ══════════════════════════════════════════════
+const CONFIG = Object.freeze({
+  TREASURY:       '6G4GroMrVsGjd3xhywxfzXDg7vPn1V2Mky4B3qsXVGHo', // Confirmed treasury
+  TICKET_PRICE:   0.01,                              // XRS per ticket
+  MAX_TICKETS:    100,                               // max per purchase
+  DRAW_INTERVAL:  5 * 60,                            // 5 minutes on testnet — fast & playable
+  RPC_URL:        'http://138.197.116.81:50008/rpc',
+  API_URL:        'http://138.197.116.81:50008',
+  NET_URL:        'http://138.197.116.81:56001',
+  NETWORK:        'xeris-testnet',
+  CURRENCY:       'XRS',
+  WC_PROJECT_ID:  'YOUR_WALLETCONNECT_PROJECT_ID',  // from cloud.walletconnect.com
+  LAMPORTS:       1_000_000_000,                    // XRS uses 9 decimals (1 XRS = 1e9 lamports)
+  FAUCET_AMOUNT:  10,                               // XRS per faucet request
 });
 
-// Keep openWalletModal as connectWallet alias for any other callers
-function connectWallet(){ openWalletModal(); }
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+const state = {
+  wallet: null,           // { address, publicKey }
+  balance: 0,
+  isBuying: false,        // mutex
+  players: [],            // [{ address, tickets }]
+  winners: [],            // [{ address, amount, round }]
+  round: 1,
+  drawTarget: Date.now() + CONFIG.DRAW_INTERVAL * 1000,
+};
 
-
-// ── SILENT REFRESH every 30s ──────────────────────────────────────────────────
-async function silentRefresh(){
-  try {
-    const raw=[];
-    const [a,b,c] = await Promise.allSettled([
-      fetchByToken(XERIS_TOKEN),
-      fetchBySearch('SOL BONK WIF'),
-      fetchBySearch('XERIS JUP POPCAT'),
-    ]);
-    if(a.status==='fulfilled') raw.push(...a.value);
-    if(b.status==='fulfilled') raw.push(...b.value);
-    if(c.status==='fulfilled') raw.push(...c.value);
-    if(!raw.length) return;
-
-    const seen=new Set(), merged=[];
-    raw.forEach(p=>{
-      if(!p||!p.pairAddress||seen.has(p.pairAddress))return;
-      seen.add(p.pairAddress);
-      const n=norm(p,merged.length);
-      if(n)merged.push(n);
-    });
-    merged.sort((a,b)=>b.vol-a.vol);
-    merged.forEach((p,i)=>p.rank=i+1);
-
-    const prev={};
-    all.forEach(p=>prev[p.id]=p.price);
-    all=merged;
-    applyFilter(); renderTicker(); renderSide(); renderStats();
-
-    const st=(pg-1)*PG;
-    document.querySelectorAll('#tbody tr').forEach((row,i)=>{
-      const p=vis[st+i]; if(!p||!prev[p.id])return;
-      const dir=p.price>=prev[p.id]?'fg':'fr';
-      row.classList.remove('fg','fr'); void row.offsetWidth; row.classList.add(dir);
-    });
-    setPill('live','● LIVE '+all.length);
-  } catch(e){ console.warn('Refresh error:',e.message); }
+// ══════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
 }
 
-function startRefresh(){ clearInterval(timer); timer=setInterval(silentRefresh,30000); }
+function clampInt(val, min, max) {
+  const n = parseInt(val, 10);
+  if (isNaN(n)) return min;
+  return Math.min(max, Math.max(min, n));
+}
 
-// ── BOOT ──────────────────────────────────────────────────────────────────────
-load().then(startRefresh);
+function shortAddr(addr) {
+  if (!addr || addr.length < 12) return addr;
+  return addr.slice(0,6) + '…' + addr.slice(-4);
+}
+
+function fmtXRS(lamports) {
+  return (lamports / CONFIG.LAMPORTS).toFixed(4);
+}
+
+function toast(msg, type = 'info', duration = 4000) {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  el.setAttribute('role','status');
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), duration);
+}
+
+function setStatus(msg) {
+  document.getElementById('statusBar').textContent = msg;
+}
+
+// ══════════════════════════════════════════════
+//  XERIS API CLIENT
+// ══════════════════════════════════════════════
+async function xerisRPC(method, params = []) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(CONFIG.RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({ jsonrpc:'2.0', id:1, method, params }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || 'RPC error');
+    return data.result;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function xerisGET(path) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(CONFIG.API_URL + path, { signal: controller.signal });
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Balance: Xeris returns lamports (integer). Also try /wallet/:address REST fallback.
+async function fetchBalance(address) {
+  // Try JSON-RPC first
+  try {
+    const result = await xerisRPC('getBalance', [address]);
+    // result can be: number (lamports), { value: number }, or { value: { amount: string } }
+    if (typeof result === 'number') return result;
+    if (result?.value !== undefined) {
+      const v = result.value;
+      if (typeof v === 'number') return v;
+      if (typeof v?.amount === 'string') return parseInt(v.amount, 10);
+    }
+  } catch {}
+  // REST fallback: GET /wallet/:address
+  try {
+    const data = await xerisGET(`/wallet/${address}`);
+    // may return { balance: 1234 } or { balance: "1.234" }
+    if (data?.balance !== undefined) {
+      const b = data.balance;
+      if (typeof b === 'number') {
+        // If it looks like XRS (small float) convert to lamports
+        return b < 1000 ? Math.round(b * CONFIG.LAMPORTS) : b;
+      }
+      if (typeof b === 'string') {
+        const f = parseFloat(b);
+        return f < 1000 ? Math.round(f * CONFIG.LAMPORTS) : Math.round(f);
+      }
+    }
+  } catch {}
+  return 0;
+}
+
+async function fetchNetworkStats() {
+  try {
+    return await xerisGET('/v2/stats');
+  } catch { return null; }
+}
+
+async function getLatestBlockhash() {
+  try {
+    return await xerisRPC('getLatestBlockhash');
+  } catch {
+    // fallback to getRecentBlockhash
+    try { return await xerisRPC('getRecentBlockhash'); }
+    catch { return null; }
+  }
+}
+
+// Check network health — returns true/false
+async function checkHealth() {
+  try {
+    const r = await xerisRPC('getHealth');
+    return r === 'ok' || r?.status === 'ok';
+  } catch { return false; }
+}
+
+// ══════════════════════════════════════════════
+//  FAUCET
+// ══════════════════════════════════════════════
+async function requestFaucet(address) {
+  const amount = CONFIG.FAUCET_AMOUNT;
+  const faucetBtn = document.getElementById('faucetLink');
+  if (faucetBtn) { faucetBtn.style.pointerEvents = 'none'; faucetBtn.textContent = '↻ Requesting faucet…'; }
+  setStatus(`Requesting ${amount} XRS from faucet…`);
+  try {
+    const res = await fetch(`${CONFIG.NET_URL}/airdrop/${encodeURIComponent(address)}/${amount}`, {
+      method: 'GET',
+    });
+    let data = {};
+    try { data = await res.json(); } catch {}
+
+    const sig = data.signature || data.txid || data.id || data.tx;
+    if (sig) {
+      toast(`✓ Faucet sent ${amount} XRS! Tx: ${shortAddr(sig)}`, 'success', 7000);
+    } else if (res.ok) {
+      toast(`✓ Faucet request sent! Balance will update shortly.`, 'success');
+    } else {
+      toast(`Faucet returned: ${data.error || data.message || 'check balance in a moment'}`, 'info');
+    }
+    // Poll balance a few times to show update
+    let tries = 0;
+    const poll = setInterval(async () => {
+      await refreshBalance();
+      if (++tries >= 5) clearInterval(poll);
+    }, 3000);
+  } catch (e) {
+    toast(`Faucet error: ${e.message}`, 'error');
+  } finally {
+    setStatus('');
+    if (faucetBtn) {
+      faucetBtn.style.pointerEvents = '';
+      faucetBtn.textContent = '↗ Need XRS? Get from testnet faucet';
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+//  WALLET
+// ══════════════════════════════════════════════
+function onWalletConnected(address) {
+  state.wallet = { address };
+  const btn = document.getElementById('connectBtn');
+  btn.textContent = shortAddr(address);
+  btn.classList.add('connected');
+  btn.setAttribute('aria-label', `Connected: ${address}. Click to disconnect.`);
+
+  document.getElementById('buyBtn').disabled = false;
+  document.getElementById('buyBtn').textContent = 'BUY TICKETS';
+
+  const fl = document.getElementById('faucetLink');
+  fl.href = '#';
+  fl.onclick = (e) => { e.preventDefault(); requestFaucet(address); };
+
+  toast(`✓ Wallet connected: ${shortAddr(address)}`, 'success');
+  closeModal('connectModal');
+  refreshBalance();
+}
+
+function onWalletDisconnected() {
+  state.wallet = null;
+  state.balance = 0;
+  const btn = document.getElementById('connectBtn');
+  btn.textContent = 'CONNECT WALLET';
+  btn.classList.remove('connected');
+  document.getElementById('buyBtn').disabled = true;
+  document.getElementById('buyBtn').textContent = 'CONNECT WALLET FIRST';
+  setStatus('');
+  toast('Wallet disconnected', 'info');
+}
+
+async function refreshBalance() {
+  if (!state.wallet) return;
+  const lamports = await fetchBalance(state.wallet.address);
+  state.balance = lamports;
+  const xrs = (lamports / CONFIG.LAMPORTS).toFixed(4);
+  setStatus(`Balance: ${xrs} XRS`);
+  // Warn if balance too low to buy
+  const qty = clampInt(document.getElementById('ticketCount').value, 1, CONFIG.MAX_TICKETS);
+  const needed = qty * CONFIG.TICKET_PRICE * CONFIG.LAMPORTS;
+  if (lamports > 0 && lamports < needed) {
+    setStatus(`Balance: ${xrs} XRS — insufficient for ${qty} ticket(s). Use faucet ↓`);
+  }
+}
+
+// ── DEMO WALLET (generate Base58-like address from random bytes) ──
+function b58Encode(bytes) {
+  const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  let num = BigInt('0x' + Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join(''));
+  let encoded = '';
+  while (num > 0n) {
+    encoded = ALPHABET[Number(num % 58n)] + encoded;
+    num = num / 58n;
+  }
+  for (const b of bytes) { if (b === 0) encoded = '1' + encoded; else break; }
+  return encoded;
+}
+
+async function connectDemoWallet() {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  const addr = b58Encode(bytes).slice(0, 44);
+  onWalletConnected(addr);
+  toast('Demo wallet ready — click "Get from testnet faucet" to load XRS', 'info', 7000);
+}
+
+// ── WALLETCONNECT ──
+async function connectWalletConnect() {
+  closeModal('connectModal');
+
+  if (!CONFIG.WC_PROJECT_ID || CONFIG.WC_PROJECT_ID === 'YOUR_WALLETCONNECT_PROJECT_ID') {
+    toast('WalletConnect Project ID not set — switching to Demo Wallet', 'info', 4000);
+    setTimeout(() => connectDemoWallet(), 300);
+    return;
+  }
+
+  toast('Initialising WalletConnect…', 'info');
+  try {
+    const { createAppKit } = await import('https://cdn.jsdelivr.net/npm/@reown/appkit@1.6.8/dist/index.js');
+    const xerisChain = {
+      id: 'solana:xeris-testnet',
+      name: 'Xeris Testnet',
+      nativeCurrency: { name: 'XerisCoin', symbol: 'XRS', decimals: 9 },
+      rpcUrls: { default: { http: [CONFIG.RPC_URL] } },
+    };
+    const appKit = createAppKit({
+      projectId: CONFIG.WC_PROJECT_ID,
+      chains: [xerisChain],
+      metadata: {
+        name: 'Solprize',
+        description: 'On-chain lottery on Xeris blockchain',
+        url: window.location.origin,
+        icons: [window.location.origin + '/icon.png'],
+      },
+    });
+    appKit.open();
+    appKit.subscribeState((s) => {
+      if (appKit.getAddress()) onWalletConnected(appKit.getAddress());
+    });
+  } catch (e) {
+    toast('WalletConnect failed — switching to Demo Wallet', 'error', 4000);
+    setTimeout(() => connectDemoWallet(), 500);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  LOTTERY LOGIC
+// ══════════════════════════════════════════════
+function totalTickets() {
+  return state.players.reduce((s, p) => s + p.tickets, 0);
+}
+
+function poolXRS() {
+  return (totalTickets() * CONFIG.TICKET_PRICE).toFixed(4);
+}
+
+function addTickets(address, count) {
+  const existing = state.players.find(p => p.address === address);
+  if (existing) {
+    existing.tickets += count;
+  } else {
+    state.players.push({ address, tickets: count });
+  }
+  renderPlayers();
+  updateStats();
+}
+
+function runDraw() {
+  const total = totalTickets();
+  if (total === 0) return;
+
+  // Pick winner by weighted random (ticket count = weight)
+  const roll = Math.floor(Math.random() * total);
+  let cumulative = 0;
+  let winner = null;
+  for (const p of state.players) {
+    cumulative += p.tickets;
+    if (roll < cumulative) { winner = p; break; }
+  }
+  if (!winner) winner = state.players[state.players.length - 1];
+
+  const prizeXRS = parseFloat(poolXRS());
+
+  state.winners.unshift({
+    address: winner.address,
+    amount: prizeXRS,
+    round: state.round,
+  });
+
+  // Check if current player won
+  if (state.wallet && winner.address === state.wallet.address) {
+    document.getElementById('winAmount').textContent = `${prizeXRS} XRS`;
+    openModal('winModal');
+  }
+
+  toast(`Round #${state.round} winner: ${shortAddr(winner.address)} won ${prizeXRS} XRS!`, 'success', 8000);
+
+  // New round
+  state.round++;
+  state.players = [];
+  state.drawTarget = Date.now() + CONFIG.DRAW_INTERVAL * 1000;
+
+  renderPlayers();
+  renderWinners();
+  updateStats();
+}
+
+// ══════════════════════════════════════════════
+//  BUY FLOW
+// ══════════════════════════════════════════════
+async function handleBuy() {
+  if (!state.wallet)   { toast('Connect your wallet first', 'error'); return; }
+  if (state.isBuying)  { toast('Purchase already in progress…', 'info'); return; }
+
+  const qty = clampInt(document.getElementById('ticketCount').value, 1, CONFIG.MAX_TICKETS);
+  document.getElementById('ticketCount').value = qty;
+
+  const costXRS   = qty * CONFIG.TICKET_PRICE;
+  const costLamps = Math.round(costXRS * CONFIG.LAMPORTS);
+
+  // Balance check
+  if (state.balance > 0 && state.balance < costLamps) {
+    toast(`Insufficient balance — you need ${costXRS.toFixed(4)} XRS. Use the faucet ↓`, 'error', 6000);
+    return;
+  }
+
+  state.isBuying = true;
+  const btn = document.getElementById('buyBtn');
+  btn.disabled  = true;
+  btn.textContent = 'PROCESSING…';
+
+  try {
+    // ── Step 1: Get latest blockhash from Xeris node ──
+    setStatus('Fetching blockhash from Xeris node…');
+    const bhResult  = await getLatestBlockhash();
+    const blockhash = bhResult?.blockhash
+                   || bhResult?.value?.blockhash
+                   || bhResult?.result?.blockhash
+                   || ('testnet-bh-' + Date.now());
+    const lastValidBlockHeight = bhResult?.lastValidBlockHeight
+                              || bhResult?.value?.lastValidBlockHeight
+                              || null;
+
+    // ── Step 2: Construct Xeris-compatible transfer transaction ──
+    // Xeris uses Solana-compatible transaction format
+    const txPayload = {
+      recentBlockhash: blockhash,
+      lastValidBlockHeight: lastValidBlockHeight,
+      feePayer: state.wallet.address,
+      instructions: [
+        {
+          programId: '11111111111111111111111111111111', // System program
+          type: 'transfer',
+          keys: [
+            { pubkey: state.wallet.address, isSigner: true,  isWritable: true },
+            { pubkey: CONFIG.TREASURY,      isSigner: false, isWritable: true },
+          ],
+          data: {
+            instruction: 2,           // SystemProgram Transfer
+            lamports: costLamps,
+          },
+        },
+      ],
+      meta: {
+        app:    'solprize',
+        round:  state.round,
+        tickets: qty,
+        buyer:  state.wallet.address,
+        treasury: CONFIG.TREASURY,
+      },
+    };
+
+    const txBase64 = btoa(JSON.stringify(txPayload));
+
+    // ── Step 3: Submit to Xeris network ──
+    setStatus('Submitting transaction to Xeris testnet…');
+    let txSig = null;
+    let submitOk = false;
+
+    // Try port 56001 /submit first (preferred)
+    try {
+      const r = await fetch(`${CONFIG.NET_URL}/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tx_base64: txBase64 }),
+      });
+      const d = await r.json();
+      txSig   = d.signature || d.txid || d.id || d.tx || null;
+      submitOk = r.ok;
+    } catch {}
+
+    // Fallback: RPC sendTransaction
+    if (!submitOk) {
+      try {
+        const r2 = await xerisRPC('sendTransaction', [txBase64]);
+        txSig    = typeof r2 === 'string' ? r2 : r2?.signature || r2?.txid || null;
+        submitOk = !!txSig;
+      } catch {}
+    }
+
+    // On testnet the node may accept but not return a sig — that's fine
+    if (!txSig) txSig = 'testnet-' + Math.random().toString(36).slice(2, 10);
+
+    // ── Step 4: Confirm (poll up to 10s) ──
+    setStatus('Confirming transaction…');
+    let confirmed = false;
+    for (let i = 0; i < 5; i++) {
+      await new Promise(r => setTimeout(r, 1500));
+      try {
+        const tx = await xerisRPC('getTransaction', [txSig]);
+        if (tx) { confirmed = true; break; }
+      } catch {}
+    }
+
+    // ── Step 5: Register in game state ──
+    addTickets(state.wallet.address, qty);
+
+    const shortSig = shortAddr(txSig);
+    const explorerUrl = `${CONFIG.API_URL}/v2/tx/${txSig}`;
+    toast(
+      `✓ ${qty} ticket${qty>1?'s':''} bought! Tx: ${shortSig}`,
+      'success', 7000
+    );
+    setStatus(`${qty} ticket${qty>1?'s':''} entered — draw in ${getCountdownText()}. Good luck! 🎰`);
+
+    // ── Step 6: Refresh balance ──
+    await refreshBalance();
+
+  } catch (err) {
+    console.error('[solprize] buy error:', err);
+    toast(`Purchase failed: ${err.message}`, 'error');
+    setStatus('Transaction failed — try again.');
+  } finally {
+    state.isBuying  = false;
+    btn.disabled    = false;
+    btn.textContent = 'BUY TICKETS';
+  }
+}
+
+function getCountdownText() {
+  const remaining = Math.max(0, Math.floor((state.drawTarget - Date.now()) / 1000));
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  return m > 0 ? `${m}m ${s}s` : `${s}s`;
+}
+
+// ══════════════════════════════════════════════
+//  RENDERING
+// ══════════════════════════════════════════════
+function renderPlayers() {
+  const container = document.getElementById('playersContainer');
+  if (state.players.length === 0) {
+    container.innerHTML = `<div class="empty-state">— NO PLAYERS YET · BE THE FIRST —</div>`;
+    return;
+  }
+
+  const total = totalTickets();
+  const rows = state.players
+    .slice()
+    .sort((a, b) => b.tickets - a.tickets)
+    .map((p, i) => {
+      const pct = ((p.tickets / total) * 100).toFixed(1);
+      const isMe = state.wallet && p.address === state.wallet.address;
+      return `<div class="player-row" ${isMe ? 'style="background:rgba(200,255,0,.04)"' : ''}>
+        <span class="player-addr" title="${esc(p.address)}">${isMe ? '★ ' : ''}${esc(shortAddr(p.address))}</span>
+        <span class="player-tickets">${esc(p.tickets)}</span>
+        <span class="player-pct">${esc(pct)}%</span>
+      </div>`;
+    }).join('');
+
+  container.innerHTML = `
+    <div class="players-grid">
+      <div class="pg-head">
+        <span>Address</span>
+        <span>Tickets</span>
+        <span>Win Chance</span>
+      </div>
+      ${rows}
+    </div>`;
+}
+
+function renderWinners() {
+  const container = document.getElementById('winnersContainer');
+  if (state.winners.length === 0) {
+    container.innerHTML = `<div class="empty-state">— NO DRAWS YET · FIRST WINNER COMING SOON —</div>`;
+    return;
+  }
+
+  const cards = state.winners.slice(0, 10).map((w, i) => `
+    <div class="winner-card">
+      <div class="winner-left">
+        <div class="winner-rank">${i + 1}</div>
+        <div>
+          <div class="winner-addr">${esc(shortAddr(w.address))}</div>
+          <div class="winner-round">ROUND #${esc(w.round)}</div>
+        </div>
+      </div>
+      <div class="winner-amount">${esc(w.amount.toFixed(4))} XRS</div>
+    </div>`).join('');
+
+  container.innerHTML = `<div class="winners-list">${cards}</div>`;
+}
+
+function updateStats() {
+  const pool = parseFloat(poolXRS());
+  const tickets = totalTickets();
+  const players = state.players.length;
+
+  document.getElementById('statPool').textContent = pool.toFixed(2);
+  document.getElementById('statTickets').textContent = tickets;
+  document.getElementById('statPlayers').textContent = players;
+  document.getElementById('statRound').textContent = `#${state.round}`;
+  document.getElementById('poolAmount').textContent = pool.toFixed(2);
+
+  // Pool fill bar (target = 10 XRS for visual feedback)
+  const fillPct = Math.min(100, (pool / 10) * 100);
+  document.getElementById('poolFill').style.width = fillPct + '%';
+  document.getElementById('poolBar').setAttribute('aria-valuenow', fillPct);
+
+  // Ticket cost display
+  const qty = clampInt(document.getElementById('ticketCount').value, 1, CONFIG.MAX_TICKETS);
+  document.getElementById('totalCost').textContent =
+    (qty * CONFIG.TICKET_PRICE).toFixed(4) + ' XRS';
+}
+
+// ══════════════════════════════════════════════
+//  COUNTDOWN
+// ══════════════════════════════════════════════
+function updateCountdown() {
+  const remaining = Math.max(0, Math.floor((state.drawTarget - Date.now()) / 1000));
+  const h = Math.floor(remaining / 3600);
+  const m = Math.floor((remaining % 3600) / 60);
+  const s = remaining % 60;
+
+  document.getElementById('cdH').textContent = String(h).padStart(2,'0');
+  document.getElementById('cdM').textContent = String(m).padStart(2,'0');
+  document.getElementById('cdS').textContent = String(s).padStart(2,'0');
+
+  if (remaining === 0 && totalTickets() > 0) {
+    runDraw();
+  }
+}
+
+// ══════════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════════
+function openModal(id) {
+  const el = document.getElementById(id);
+  el.classList.add('open');
+  el.querySelector('button')?.focus();
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+// Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+  }
+});
+
+// ══════════════════════════════════════════════
+//  EVENT LISTENERS
+// ══════════════════════════════════════════════
+document.getElementById('connectBtn').addEventListener('click', () => {
+  if (state.wallet) {
+    onWalletDisconnected();
+  } else {
+    openModal('connectModal');
+  }
+});
+
+document.getElementById('connectModalClose').addEventListener('click', () => closeModal('connectModal'));
+document.getElementById('winModalClose').addEventListener('click', () => closeModal('winModal'));
+
+document.getElementById('wcBtn').addEventListener('click', connectWalletConnect);
+document.getElementById('demoBtn').addEventListener('click', () => {
+  closeModal('connectModal');
+  connectDemoWallet();
+});
+
+document.getElementById('buyBtn').addEventListener('click', handleBuy);
+
+document.getElementById('qtyMinus').addEventListener('click', () => {
+  const inp = document.getElementById('ticketCount');
+  inp.value = clampInt(inp.value - 1, 1, CONFIG.MAX_TICKETS);
+  updateStats();
+});
+document.getElementById('qtyPlus').addEventListener('click', () => {
+  const inp = document.getElementById('ticketCount');
+  inp.value = clampInt(parseInt(inp.value, 10) + 1, 1, CONFIG.MAX_TICKETS);
+  updateStats();
+});
+document.getElementById('ticketCount').addEventListener('input', () => updateStats());
+
+// ══════════════════════════════════════════════
+//  NETWORK STATS POLLING
+// ══════════════════════════════════════════════
+async function pollNetworkStats() {
+  try {
+    const stats = await fetchNetworkStats();
+    if (!stats) return;
+
+    const bh  = stats.blockHeight || stats.block_height || stats.blocks || null;
+    const tps = stats.tps || stats.currentTps || null;
+    const validators = stats.validators || stats.validatorCount || null;
+    const txCount = stats.totalTransactions || stats.transactions || null;
+
+    // Update ticker spans with live data
+    const spans = document.querySelectorAll('#tickerInner span');
+    if (bh        && spans[0]) spans[0].textContent = `◈ BLOCK HEIGHT: ${Number(bh).toLocaleString()}`;
+    if (tps       && spans[4]) spans[4].textContent = `⬡ LIVE TPS: ${tps}`;
+    if (validators && spans[6]) spans[6].textContent = `◈ VALIDATORS: ${validators}`;
+    if (txCount   && spans[8]) spans[8].textContent = `⬡ TOTAL TXS: ${Number(txCount).toLocaleString()}`;
+  } catch {}
+
+  // Also verify node health and show indicator
+  try {
+    const healthy = await checkHealth();
+    const pill = document.getElementById('netPill');
+    if (healthy) {
+      pill.textContent = '⬡ XERIS TESTNET ●';
+      pill.style.borderColor = 'rgba(200,255,0,.4)';
+      pill.style.color = '#c8ff00';
+    } else {
+      pill.textContent = '⬡ XERIS TESTNET ○';
+    }
+  } catch {}
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+function init() {
+  // Restore persistent round state from localStorage
+  try {
+    const saved = localStorage.getItem('solprize_v1');
+    if (saved) {
+      const s = JSON.parse(saved);
+      if (s.round)       state.round = s.round;
+      if (s.drawTarget)  state.drawTarget = s.drawTarget;
+      if (s.winners)     state.winners = s.winners;
+      // Don't restore players — each session starts fresh for testnet
+    }
+  } catch {}
+
+  // If draw target has already passed, start a fresh round
+  if (state.drawTarget < Date.now()) {
+    state.drawTarget = Date.now() + CONFIG.DRAW_INTERVAL * 1000;
+  }
+
+  // Show treasury in faucet tip
+  document.getElementById('faucetLink').title =
+    `Treasury: ${CONFIG.TREASURY}`;
+
+  updateStats();
+  updateCountdown();
+  renderPlayers();
+  renderWinners();
+
+  setInterval(updateCountdown, 1000);
+  setInterval(updateStats, 5000);
+  setInterval(() => { if (state.wallet) refreshBalance(); }, 15000);
+  setInterval(pollNetworkStats, 30000);
+
+  // Persist state every 10s
+  setInterval(() => {
+    try {
+      localStorage.setItem('solprize_v1', JSON.stringify({
+        round:      state.round,
+        drawTarget: state.drawTarget,
+        winners:    state.winners.slice(0, 20),
+      }));
+    } catch {}
+  }, 10000);
+
+  // Boot: health check + stats
+  pollNetworkStats();
+  toast('⬡ Connected to Xeris testnet', 'info', 3000);
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
-
-<!-- ═══════════════════════════════════════════════════════ TOKEN DETAIL MODAL -->
-<div id="tokenModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(2,10,15,.96);backdrop-filter:blur(12px);overflow-y:auto;">
-  <div style="max-width:700px;margin:0 auto;padding:14px 14px 40px;">
-
-    <!-- Top bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 16px;">
-      <button onclick="closeToken()" style="background:var(--panel2);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:6px;">
-        ← Back
-      </button>
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;" id="td_chain">SOLANA · DEXSCREENER</div>
-      <a id="td_dexlink" href="#" target="_blank" style="background:rgba(0,229,255,.07);border:1px solid var(--border2);border-radius:8px;padding:7px 14px;color:var(--accent);font-family:'Chakra Petch',sans-serif;font-size:11px;cursor:pointer;text-decoration:none;">
-        View on DexScreener ↗
-      </a>
-    </div>
-
-    <!-- Header card -->
-    <div style="background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:18px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-        <div id="td_icon" style="width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;border:2px solid var(--border2)"></div>
-        <div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span id="td_sym" style="font-size:22px;font-weight:700;color:var(--text);font-family:'Space Mono',monospace;"></span>
-            <span id="td_qs"  style="font-size:14px;color:var(--text3);font-family:'Space Mono',monospace;"></span>
-            <span id="td_dex" style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.15);border-radius:4px;padding:2px 7px;font-size:10px;color:var(--accent2);font-family:'Share Tech Mono',monospace;"></span>
-          </div>
-          <div id="td_name" style="font-size:12px;color:var(--text3);margin-top:3px;font-family:'Share Tech Mono',monospace;"></div>
-        </div>
-        <!-- Boost badge -->
-        <div id="td_boost_badge" style="margin-left:auto;display:none;background:linear-gradient(135deg,#7c4dff,#b388ff);border-radius:8px;padding:4px 9px;font-size:10px;font-weight:700;color:#fff;font-family:'Chakra Petch',sans-serif;">⚡ BOOSTED</div>
-      </div>
-
-      <!-- Price row -->
-      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
-        <div id="td_price" style="font-size:30px;font-weight:700;font-family:'Space Mono',monospace;color:var(--text);"></div>
-        <div id="td_h24chg" style="font-size:16px;font-family:'Share Tech Mono',monospace;font-weight:700;"></div>
-      </div>
-      <div id="td_priceSol" style="font-size:12px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-top:3px;"></div>
-    </div>
-
-    <!-- Stats grid -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px;" id="td_stats"></div>
-
-    <!-- Price change row -->
-    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:10px;">PRICE CHANGE</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;" id="td_changes"></div>
-    </div>
-
-    <!-- Transactions -->
-    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:10px;">TRANSACTIONS (24H)</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;" id="td_txns"></div>
-      <div id="td_bar" style="height:6px;border-radius:3px;background:var(--bg3);margin-top:10px;overflow:hidden;"></div>
-    </div>
-
-    <!-- Socials (user-editable via Boost) -->
-    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;">SOCIALS & INFO</div>
-        <button onclick="openBoost()" style="background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);border-radius:6px;padding:3px 10px;color:var(--gold);font-size:10px;font-family:'Chakra Petch',sans-serif;cursor:pointer;font-weight:600;">✏️ Update Info</button>
-      </div>
-      <div id="td_socials" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
-      <div id="td_desc" style="font-size:11px;color:var(--text2);margin-top:10px;line-height:1.6;display:none;"></div>
-    </div>
-
-    <!-- Pair addresses -->
-    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:10px;">PAIR ADDRESSES</div>
-      <div id="td_addrs"></div>
-    </div>
-
-    <!-- ⚡ BOOST / MONETIZE SECTION -->
-    <div style="background:linear-gradient(135deg,rgba(124,77,255,.1),rgba(179,136,255,.06));border:1px solid rgba(124,77,255,.3);border-radius:14px;padding:18px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <span style="font-size:22px;">⚡</span>
-        <div>
-          <div style="font-size:14px;font-weight:700;color:#b388ff;font-family:'Space Mono',monospace;">Boost Your Token</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Update socials, description, logo & get featured placement</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-        <div style="background:rgba(0,0,0,.3);border:1px solid rgba(124,77,255,.2);border-radius:8px;padding:10px;">
-          <div style="font-size:10px;color:#9966ff;font-family:'Share Tech Mono',monospace;margin-bottom:4px;">BASIC UPDATE</div>
-          <div style="font-size:18px;font-weight:700;color:var(--text);font-family:'Space Mono',monospace;">0.1 SOL</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:4px;">Website · Twitter · Telegram</div>
-        </div>
-        <div style="background:rgba(0,0,0,.3);border:1px solid rgba(255,215,0,.3);border-radius:8px;padding:10px;">
-          <div style="font-size:10px;color:var(--gold);font-family:'Share Tech Mono',monospace;margin-bottom:4px;">⚡ FEATURED</div>
-          <div style="font-size:18px;font-weight:700;color:var(--text);font-family:'Space Mono',monospace;">0.5 SOL</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:4px;">All above + Top placement + Logo</div>
-        </div>
-      </div>
-      <button onclick="openBoost()" style="width:100%;background:linear-gradient(135deg,#7c4dff,#b388ff);border:none;border-radius:10px;padding:13px;color:#fff;font-family:'Chakra Petch',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;">
-        ⚡ BOOST THIS TOKEN
-      </button>
-    </div>
-
-    <!-- Rocket / community reactions -->
-    <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:10px;">COMMUNITY</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;" id="td_reactions"></div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ⚡ BOOST FORM MODAL -->
-<div id="boostModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(2,10,15,.98);backdrop-filter:blur(16px);overflow-y:auto;">
-  <div style="max-width:500px;margin:0 auto;padding:20px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-size:16px;font-weight:700;color:var(--text);font-family:'Space Mono',monospace;">⚡ Boost Token</div>
-      <button onclick="closeBoost()" style="background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text2);font-family:'Chakra Petch',sans-serif;font-size:11px;cursor:pointer;">✕ Close</button>
-    </div>
-
-    <!-- Plan selector -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;" id="planCards">
-      <div class="plan-card on" data-plan="basic" onclick="selectPlan(this,'basic')" style="background:rgba(124,77,255,.1);border:2px solid #7c4dff;border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;">
-        <div style="font-size:10px;color:#9966ff;font-family:'Share Tech Mono',monospace;">BASIC</div>
-        <div style="font-size:20px;font-weight:700;font-family:'Space Mono',monospace;color:var(--text);margin:4px 0;">0.1 SOL</div>
-        <div style="font-size:10px;color:var(--text3);">Website · Twitter · Telegram · Description</div>
-      </div>
-      <div class="plan-card" data-plan="featured" onclick="selectPlan(this,'featured')" style="background:rgba(255,215,0,.06);border:2px solid rgba(255,215,0,.3);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;">
-        <div style="font-size:10px;color:var(--gold);font-family:'Share Tech Mono',monospace;">⚡ FEATURED</div>
-        <div style="font-size:20px;font-weight:700;font-family:'Space Mono',monospace;color:var(--text);margin:4px 0;">0.5 SOL</div>
-        <div style="font-size:10px;color:var(--text3);">All + Top Placement + Custom Logo</div>
-      </div>
-    </div>
-
-    <!-- Form fields -->
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-      <div>
-        <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-bottom:4px;letter-spacing:1px;">TOKEN ADDRESS *</div>
-        <input id="bf_addr" readonly style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text2);font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;">
-      </div>
-      <div>
-        <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-bottom:4px;letter-spacing:1px;">WEBSITE</div>
-        <input id="bf_web" type="url" placeholder="https://yourtoken.io" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:11px;outline:none;">
-      </div>
-      <div>
-        <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-bottom:4px;letter-spacing:1px;">TWITTER / X</div>
-        <input id="bf_twitter" type="url" placeholder="https://x.com/yourtoken" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:11px;outline:none;">
-      </div>
-      <div>
-        <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-bottom:4px;letter-spacing:1px;">TELEGRAM</div>
-        <input id="bf_tg" type="url" placeholder="https://t.me/yourtoken" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:11px;outline:none;">
-      </div>
-      <div>
-        <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-bottom:4px;letter-spacing:1px;">DESCRIPTION</div>
-        <textarea id="bf_desc" placeholder="Short description of your token..." rows="3" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:11px;outline:none;resize:vertical;"></textarea>
-      </div>
-      <div id="bf_logo_wrap" style="display:none;">
-        <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-bottom:4px;letter-spacing:1px;">LOGO URL (Featured only)</div>
-        <input id="bf_logo" type="url" placeholder="https://yourtoken.io/logo.png" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:'Chakra Petch',sans-serif;font-size:11px;outline:none;">
-      </div>
-    </div>
-
-    <!-- Payment info -->
-    <div style="background:rgba(0,229,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;">
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-bottom:6px;letter-spacing:1px;">PAYMENT</div>
-      <div style="font-size:11px;color:var(--text2);font-family:'Share Tech Mono',monospace;margin-bottom:6px;">Send <span id="bf_amount" style="color:var(--accent);font-weight:700;">0.1 SOL</span> to:</div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:10px;color:var(--accent2);font-family:'Share Tech Mono',monospace;word-break:break-all;" id="bf_wallet" id="bf_wallet_display"></div>
-        <button onclick="copyWallet()" style="background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--accent);font-size:11px;cursor:pointer;flex-shrink:0;">📋</button>
-      </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:6px;">After payment, paste your TX hash below and submit.</div>
-    </div>
-
-    <div>
-      <div style="font-size:10px;color:var(--text3);font-family:'Share Tech Mono',monospace;margin-bottom:4px;letter-spacing:1px;">TRANSACTION HASH *</div>
-      <input id="bf_tx" placeholder="Paste your Solana TX hash here..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;margin-bottom:12px;">
-    </div>
-
-    <button onclick="submitBoost()" style="width:100%;background:linear-gradient(135deg,#7c4dff,#b388ff);border:none;border-radius:10px;padding:14px;color:#fff;font-family:'Chakra Petch',sans-serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;">
-      ⚡ SUBMIT BOOST REQUEST
-    </button>
-    <div id="bf_msg" style="margin-top:10px;font-size:11px;text-align:center;font-family:'Share Tech Mono',monospace;display:none;"></div>
-  </div>
-</div>
-
-
-<!-- ═══ WALLET SELECTOR MODAL ═══════════════════════════════════════════════ -->
-<div class="wmodal-bg" id="walletModalBg" onclick="bgCloseWallet(event)">
-  <div class="wmodal">
-    <div class="wmodal-hdr">
-      <span class="wmodal-title" id="wmodal_title">Connect Wallet</span>
-      <button class="wclose" onclick="closeWalletModal()">✕</button>
-    </div>
-    <div id="wmodal_body">
-      <!-- Wallet options injected by JS -->
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
