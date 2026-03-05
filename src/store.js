@@ -124,7 +124,9 @@ async function syncFromDexScreener() {
     const pairs = await dexscreener.fetchTopPairs();
 
     if (pairs.length === 0) {
-      console.warn('[DexScreener] No pairs returned — rate limited? Retrying soon.');
+      console.warn('[DexScreener] No pairs returned — rate limited? Retrying in 15s...');
+      // Retry once after 15s delay (handles transient rate limits)
+      setTimeout(syncFromDexScreener, 15_000);
       return;
     }
 
