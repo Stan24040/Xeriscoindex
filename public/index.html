@@ -460,22 +460,35 @@ function normBackend(p, idx) {
 }
 
 // ── FETCH FROM BACKEND (/api/pairs) ──────────────────────────────────────────
-var backendMode = false;  // true when running on server (not file://)
+var backendMode = false;
 var backendStats = null;
 
 async function fetchFromBackend() {
   try {
     const data = await safeFetch(window.location.origin + '/api/pairs?limit=100');
     const pairs = (data && data.pairs) ? data.pairs : [];
-    // Also grab stats
-    try {
-      backendStats = await safeFetch(window.location.origin + '/api/stats');
-    } catch(e) {}
+    try { backendStats = await safeFetch(window.location.origin + '/api/stats'); } catch(e){}
     return pairs;
   } catch(e) {
     console.warn('[XI] Backend fetch failed:', e.message);
     return [];
   }
+}
+
+// Poll backend until data arrives (handles Render cold start)
+// Retries every 3s for up to 90s before giving up
+async function waitForBackendData() {
+  const MAX_TRIES = 30;   // 30 × 3s = 90s max wait
+  const INTERVAL  = 3000;
+  for (var i = 0; i < MAX_TRIES; i++) {
+    var pairs = await fetchFromBackend();
+    if (pairs.length > 0) return pairs;
+    var secs = (MAX_TRIES - i) * (INTERVAL/1000);
+    log('Server warming up... (' + Math.round((i+1)*INTERVAL/1000) + 's)', 'wait');
+    setProg(5 + Math.round((i / MAX_TRIES) * 60));
+    await sleep(INTERVAL);
+  }
+  return [];
 }
 
 // ── FETCH STRATEGIES ──────────────────────────────────────────────────────────
@@ -501,7 +514,7 @@ async function load() {
   if (window.location.protocol !== 'file:') {
     try {
       log('Connecting to server...', 'wait');
-      const bPairs = await fetchFromBackend();
+      const bPairs = await waitForBackendData();
       if (bPairs.length > 0) {
         backendMode = true;
         setProg(80);
