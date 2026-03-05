@@ -168,9 +168,66 @@ async function fetchPair(chain, pairAddress) {
   }
 }
 
+// ── Fetch many popular Solana pairs (broad screener data) ────────────────────
+// Uses DexScreener's token endpoint for known popular tokens
+// This ensures the screener has data even if XERIS has low volume
+
+const TOP_SOLANA_TOKENS = [
+  '9ezFthWrDUpSSeMdpLW6SDD9TJigHdc4AuQ5QN5bpump', // XERIS
+  'So11111111111111111111111111111111111111112',     // SOL (wrapped)
+  'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', // BONK
+  'EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm', // WIF
+  'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN',  // JUP
+  '7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr', // POPCAT
+  'MEW1gQWJ3nEXg2qgERiKu7FAFj79PHvQVREQUzScPP5',  // MEW
+  'ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82',  // BOME
+  'A8C3xuqscfmyLrte3VmTqrAq8kgMASius9AFNANwpump',  // FWOG
+  'Df6yfrKC8kZE3KNkrHERKzAetSxbrWeniQfyJY4Jpump',  // CHILLGUY
+];
+
+const SEARCH_QUERIES = ['XERIS', 'BONK WIF SOL', 'JUP POPCAT MEW', 'TRUMP FARTCOIN', 'PEPE MEME'];
+
+async function fetchTopPairs() {
+  const all = [];
+  const seen = new Set();
+
+  const add = (pairs) => {
+    pairs.forEach(p => {
+      if (!p.id || seen.has(p.id)) return;
+      if ((p.liquidity || 0) < 50) return;
+      seen.add(p.id);
+      all.push(p);
+    });
+  };
+
+  // 1. XERIS token first
+  try {
+    const xeris = await fetchXerisTokenPairs();
+    add(xeris);
+  } catch(e) { console.error('[DexScreener] XERIS fetch:', e.message); }
+
+  // 2. Search queries for broad coverage
+  for (const q of SEARCH_QUERIES) {
+    try {
+      const r = await searchPairs(q);
+      const solana = r.filter(p => p.chain === 'solana');
+      add(solana);
+      await new Promise(res => setTimeout(res, 300)); // avoid rate limit
+    } catch(e) { /* skip */ }
+    if (all.length >= 80) break;
+  }
+
+  // Sort by volume
+  all.sort((a,b) => (b.volume24h||0) - (a.volume24h||0));
+  all.forEach((p,i) => { p.rank = i+1; });
+
+  return all;
+}
+
 module.exports = {
   fetchXerisPairs,
   fetchXerisTokenPairs,
+  fetchTopPairs,
   searchPairs,
   fetchPair,
   normalizePair,
