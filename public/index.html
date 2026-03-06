@@ -248,7 +248,7 @@
             <th class="sm">CHART</th>
           </tr></thead>
           <tbody id="tbody">
-            <tr><td colspan="13"><div class="state"><div class="spin"></div><span>Loading live Solana pairs...</span></div></td></tr>
+            <tr><td colspan="13"><div class="state"><div class="spin"></div><span>Connecting to server...</span></div></td></tr>
           </tbody>
         </table>
         <div class="bb"><span id="pc">—</span><div class="pgs" id="pgs"></div></div>
@@ -484,7 +484,14 @@ async function waitForBackendData() {
     var pairs = await fetchFromBackend();
     if (pairs.length > 0) return pairs;
     var secs = (MAX_TRIES - i) * (INTERVAL/1000);
-    log('Server warming up... (' + Math.round((i+1)*INTERVAL/1000) + 's)', 'wait');
+    var elapsed = Math.round((i+1)*INTERVAL/1000);
+    var msg = elapsed < 20 ? 'Connecting...' : elapsed < 50 ? 'Server starting (' + elapsed + 's)...' : 'Almost ready (' + elapsed + 's)...';
+    log(msg, 'wait');
+    // Update table message too
+    var tb = $('tbody');
+    if(tb && tb.innerHTML.indexOf('spin') > -1) {
+      tb.innerHTML = '<tr><td colspan="13"><div class="state"><div class="spin"></div><span>' + msg + '</span></div></td></tr>';
+    }
     setProg(5 + Math.round((i / MAX_TRIES) * 60));
     await sleep(INTERVAL);
   }
@@ -557,7 +564,8 @@ async function load() {
         return;
       }
     } catch(e) {
-      log('Server unavailable — falling back to DexScreener', 'warn');
+      log('Server timeout — loading direct from DexScreener', 'warn');
+      if($('tbody')) $('tbody').innerHTML = '<tr><td colspan="13"><div class="state"><div class="spin"></div><span>Loading via DexScreener...</span></div></td></tr>';
     }
   }
 
