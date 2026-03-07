@@ -726,14 +726,7 @@ function openModal(id){
 }
 function closeModal(e){if(e.target.id==='overlay')closeModalDirect();}
 function closeModalDirect(){$('overlay').classList.remove('open');}
-function connectWallet(){let addr=null;
-  if(window.xeris){
-    try{if(typeof window.xeris.connect==='function'){const r=await window.xeris.connect();addr=r&&(r.publicKey||r.address||r.pubkey||(typeof r==='string'?r:null));}}}catch(e){}
-    if(!addr&&window.xeris.publicKey)addr=window.xeris.publicKey;
-    if(!addr&&window.xeris.address)addr=window.xeris.address;
-    if(addr){walletAddress=addr;updateWalletBtn();showToast('Xeris Wallet connected!');}
-    else{showToast('Could not get address from wallet','error');}
-  } else { showToast('Xeris Wallet not detected','error'); }}
+function connectWallet(){alert('Xeris wallet integration coming soon.\n\nThe xeris-sdk npm package will handle:\n• Ed25519 keypair generation\n• Transaction signing\n• On-chain swaps & launchpad buys');}
 
 // ─────────────────────────────────────────────────────────────
 // DATA — XERIS TESTNET
