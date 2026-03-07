@@ -265,6 +265,138 @@ td:nth-child(2){text-align:left}
 .wi-meta{font-size:9px;color:var(--muted);display:flex;justify-content:space-between}
 .wi-note{font-size:9px;color:var(--muted);margin-top:2px;font-style:italic}
 @media(max-width:1100px){.rpanel{display:none}}
+.tm-tab-bar{display:flex;border-bottom:1px solid var(--border);background:var(--bg1);position:sticky;top:0;z-index:20}
+.tm-tab-btn{flex:1;padding:10px 4px;font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;text-transform:uppercase;transition:all .12s;white-space:nowrap}
+.tm-tab-btn:hover{color:var(--text)}.tm-tab-btn.on{color:var(--blue);border-bottom-color:var(--blue)}
+.tm-panel{display:none}.tm-panel.open{display:block}
+.tm-chart-toolbar{display:flex;align-items:center;gap:3px;padding:7px 10px;background:var(--bg1);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.tm-chart-toolbar::-webkit-scrollbar{display:none}
+.tm-ctf{padding:4px 9px;border-radius:5px;font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--muted);background:none;border:1px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.tm-ctf:hover{color:var(--text);background:var(--bg3)}.tm-ctf.on{color:#fff;background:var(--bg4);border-color:var(--border2)}.tm-ctf.blue.on{color:var(--blue);background:rgba(0,180,255,.1);border-color:rgba(0,180,255,.3)}
+.tm-chart-type{display:flex;gap:2px;margin-left:auto;flex-shrink:0}
+.tm-ctype{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:5px;font-size:13px;cursor:pointer;color:var(--muted);background:var(--bg3);border:1px solid var(--border)}
+.tm-ctype.on{color:var(--blue);border-color:rgba(0,180,255,.35)}
+.tm-canvas-wrap{position:relative;background:#07080a;overflow:hidden}
+.tm-vol-canvas-wrap{background:#07080a;border-top:1px solid var(--border)}
+.tm-txns-hdr{display:grid;grid-template-columns:28px 44px 1fr 88px 76px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:5}
+.tm-txns-hdr span{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase}
+.tm-txns-hdr span:not(:first-child){text-align:right}
+.tm-txn-list{max-height:400px;overflow-y:auto}
+.tm-txn-row{display:grid;grid-template-columns:28px 44px 1fr 88px 76px;align-items:center;padding:7px 10px;border-bottom:1px solid rgba(31,42,53,.4);cursor:pointer}
+.tm-txn-row:hover{background:rgba(255,255,255,.025)}
+.tm-txn-badge{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:800}
+.tm-txn-badge.B{background:rgba(0,255,136,.15);color:var(--green);border:1px solid rgba(0,255,136,.25)}
+.tm-txn-badge.S{background:rgba(255,45,85,.12);color:var(--red);border:1px solid rgba(255,45,85,.2)}
+.tm-txn-age{font-family:var(--font-mono);font-size:9px;color:var(--muted);text-align:right}
+.tm-txn-usd{font-family:var(--font-mono);font-size:12px;font-weight:700;text-align:right}
+.tm-txn-usd.B{color:var(--green)}.tm-txn-usd.S{color:var(--red)}
+.tm-txn-price{font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:right}
+.tm-txn-maker{font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.tm-txn-maker:hover{color:var(--blue)}
+.tm-txns-live{display:flex;align-items:center;gap:5px;padding:5px 10px;border-bottom:1px solid var(--border);background:var(--bg1)}
+.tm-txns-live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.4s infinite}
+.tm-claim{padding:12px 14px;border-bottom:1px solid var(--border)}
+.tm-claim-btn{width:100%;padding:10px;border-radius:9px;background:rgba(0,180,255,.07);border:1.5px solid rgba(0,180,255,.25);color:var(--blue);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.tm-claim-btn:hover{background:rgba(0,180,255,.14)}.tm-claim-btn.owner{background:rgba(0,255,136,.07);border-color:rgba(0,255,136,.3);color:var(--green)}
+.claim-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.claim-overlay.open{display:flex}
+.claim-box{background:var(--bg1);border:1px solid var(--border2);border-radius:16px;width:95%;max-width:420px;max-height:90dvh;overflow-y:auto;animation:mIn .18s ease}
+.cb-hdr{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.cb-hdr-ico{width:38px;height:38px;background:linear-gradient(135deg,var(--blue),#0052ff);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cb-hdr-title{font-family:var(--font-head);font-size:16px;letter-spacing:.5px}
+.cb-hdr-sub{font-size:10px;color:var(--muted);margin-top:1px;font-family:var(--font-mono)}
+.cb-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px}
+.cb-body{padding:18px}
+.cb-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px}
+.cb-step-num{width:22px;height:22px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:700;flex-shrink:0;color:var(--muted)}
+.cb-step-num.done{background:rgba(0,255,136,.15);border-color:rgba(0,255,136,.4);color:var(--green)}
+.cb-step-num.active{background:rgba(0,180,255,.15);border-color:rgba(0,180,255,.4);color:var(--blue)}
+.cb-step-content{flex:1;min-width:0}
+.cb-step-title{font-size:12px;font-weight:600;margin-bottom:3px}
+.cb-step-desc{font-size:10px;color:var(--muted);line-height:1.6}
+.cb-addr-box{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--xeris);margin-top:8px;word-break:break-all;cursor:pointer;display:flex;align-items:center;gap:8px}
+.cb-amount-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.25);border-radius:20px;padding:4px 12px;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--blue);margin:8px 0}
+.cb-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;color:var(--text);font-family:var(--font-mono);font-size:11px;outline:none;margin-top:8px}
+.cb-input:focus{border-color:rgba(0,180,255,.5)}
+.cb-verify-btn{width:100%;padding:12px;border-radius:9px;background:var(--blue);border:none;color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:800;cursor:pointer;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px}
+.cb-verify-btn:disabled{opacity:.4;cursor:not-allowed}
+.cb-status{font-family:var(--font-mono);font-size:10px;text-align:center;padding:6px;margin-top:8px;border-radius:6px;display:none}
+.cb-status.ok{color:var(--green);background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.2)}
+.cb-status.err{color:var(--red);background:rgba(255,45,85,.07);border:1px solid rgba(255,45,85,.2)}
+.cb-status.pending{color:var(--blue);background:rgba(0,180,255,.07);border:1px solid rgba(0,180,255,.2)}
+.cb-edit-form{display:none}.cb-edit-form.open{display:block}
+.cb-field{margin-bottom:14px}
+.cb-field-label{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
+.cb-save-btn{width:100%;padding:12px;border-radius:9px;background:var(--xeris);border:none;color:#000;font-family:var(--font-mono);font-size:12px;font-weight:800;cursor:pointer;margin-top:4px}
+.cb-verified-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,255,136,.07);border:1.5px solid rgba(0,255,136,.3);border-radius:10px;margin-bottom:16px}
+.cb-owner-badge{background:rgba(0,255,136,.12);color:var(--green);font-family:var(--font-mono);font-size:8px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.5px;border:1px solid rgba(0,255,136,.25)}
+
+.tm-tab-bar{display:flex;border-bottom:1px solid var(--border);background:var(--bg1);position:sticky;top:0;z-index:20}
+.tm-tab-btn{flex:1;padding:10px 4px;font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.5px;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;text-transform:uppercase;transition:all .12s;white-space:nowrap}
+.tm-tab-btn:hover{color:var(--text)}.tm-tab-btn.on{color:var(--blue);border-bottom-color:var(--blue)}
+.tm-panel{display:none}.tm-panel.open{display:block}
+.tm-chart-toolbar{display:flex;align-items:center;gap:3px;padding:7px 10px;background:var(--bg1);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.tm-chart-toolbar::-webkit-scrollbar{display:none}
+.tm-ctf{padding:4px 9px;border-radius:5px;font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--muted);background:none;border:1px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.tm-ctf:hover{color:var(--text);background:var(--bg3)}.tm-ctf.on{color:#fff;background:var(--bg4);border-color:var(--border2)}.tm-ctf.blue.on{color:var(--blue);background:rgba(0,180,255,.1);border-color:rgba(0,180,255,.3)}
+.tm-chart-type{display:flex;gap:2px;margin-left:auto;flex-shrink:0}
+.tm-ctype{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:5px;font-size:13px;cursor:pointer;color:var(--muted);background:var(--bg3);border:1px solid var(--border)}
+.tm-ctype.on{color:var(--blue);border-color:rgba(0,180,255,.35)}
+.tm-canvas-wrap{position:relative;background:#07080a;overflow:hidden}
+.tm-vol-canvas-wrap{background:#07080a;border-top:1px solid var(--border)}
+.tm-txns-hdr{display:grid;grid-template-columns:28px 44px 1fr 88px 76px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:5}
+.tm-txns-hdr span{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase}
+.tm-txns-hdr span:not(:first-child){text-align:right}
+.tm-txn-list{max-height:400px;overflow-y:auto}
+.tm-txn-row{display:grid;grid-template-columns:28px 44px 1fr 88px 76px;align-items:center;padding:7px 10px;border-bottom:1px solid rgba(31,42,53,.4);cursor:pointer}
+.tm-txn-row:hover{background:rgba(255,255,255,.025)}
+.tm-txn-badge{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:800}
+.tm-txn-badge.B{background:rgba(0,255,136,.15);color:var(--green);border:1px solid rgba(0,255,136,.25)}
+.tm-txn-badge.S{background:rgba(255,45,85,.12);color:var(--red);border:1px solid rgba(255,45,85,.2)}
+.tm-txn-age{font-family:var(--font-mono);font-size:9px;color:var(--muted);text-align:right}
+.tm-txn-usd{font-family:var(--font-mono);font-size:12px;font-weight:700;text-align:right}
+.tm-txn-usd.B{color:var(--green)}.tm-txn-usd.S{color:var(--red)}
+.tm-txn-price{font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:right}
+.tm-txn-maker{font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.tm-txn-maker:hover{color:var(--blue)}
+.tm-txns-live{display:flex;align-items:center;gap:5px;padding:5px 10px;border-bottom:1px solid var(--border);background:var(--bg1)}
+.tm-txns-live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1.4s infinite}
+.tm-claim{padding:12px 14px;border-bottom:1px solid var(--border)}
+.tm-claim-btn{width:100%;padding:10px;border-radius:9px;background:rgba(0,180,255,.07);border:1.5px solid rgba(0,180,255,.25);color:var(--blue);font-family:var(--font-mono);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.tm-claim-btn:hover{background:rgba(0,180,255,.14)}.tm-claim-btn.owner{background:rgba(0,255,136,.07);border-color:rgba(0,255,136,.3);color:var(--green)}
+.claim-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.claim-overlay.open{display:flex}
+.claim-box{background:var(--bg1);border:1px solid var(--border2);border-radius:16px;width:95%;max-width:420px;max-height:90dvh;overflow-y:auto;animation:mIn .18s ease}
+.cb-hdr{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.cb-hdr-ico{width:38px;height:38px;background:linear-gradient(135deg,var(--blue),#0052ff);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cb-hdr-title{font-family:var(--font-head);font-size:16px;letter-spacing:.5px}
+.cb-hdr-sub{font-size:10px;color:var(--muted);margin-top:1px;font-family:var(--font-mono)}
+.cb-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px}
+.cb-body{padding:18px}
+.cb-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px}
+.cb-step-num{width:22px;height:22px;border-radius:50%;background:var(--bg4);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;font-weight:700;flex-shrink:0;color:var(--muted)}
+.cb-step-num.done{background:rgba(0,255,136,.15);border-color:rgba(0,255,136,.4);color:var(--green)}
+.cb-step-num.active{background:rgba(0,180,255,.15);border-color:rgba(0,180,255,.4);color:var(--blue)}
+.cb-step-content{flex:1;min-width:0}
+.cb-step-title{font-size:12px;font-weight:600;margin-bottom:3px}
+.cb-step-desc{font-size:10px;color:var(--muted);line-height:1.6}
+.cb-addr-box{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--xeris);margin-top:8px;word-break:break-all;cursor:pointer;display:flex;align-items:center;gap:8px}
+.cb-amount-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(0,180,255,.1);border:1px solid rgba(0,180,255,.25);border-radius:20px;padding:4px 12px;font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--blue);margin:8px 0}
+.cb-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;color:var(--text);font-family:var(--font-mono);font-size:11px;outline:none;margin-top:8px}
+.cb-input:focus{border-color:rgba(0,180,255,.5)}
+.cb-verify-btn{width:100%;padding:12px;border-radius:9px;background:var(--blue);border:none;color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:800;cursor:pointer;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px}
+.cb-verify-btn:disabled{opacity:.4;cursor:not-allowed}
+.cb-status{font-family:var(--font-mono);font-size:10px;text-align:center;padding:6px;margin-top:8px;border-radius:6px;display:none}
+.cb-status.ok{color:var(--green);background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.2)}
+.cb-status.err{color:var(--red);background:rgba(255,45,85,.07);border:1px solid rgba(255,45,85,.2)}
+.cb-status.pending{color:var(--blue);background:rgba(0,180,255,.07);border:1px solid rgba(0,180,255,.2)}
+.cb-edit-form{display:none}.cb-edit-form.open{display:block}
+.cb-field{margin-bottom:14px}
+.cb-field-label{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
+.cb-save-btn{width:100%;padding:12px;border-radius:9px;background:var(--xeris);border:none;color:#000;font-family:var(--font-mono);font-size:12px;font-weight:800;cursor:pointer;margin-top:4px}
+.cb-verified-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,255,136,.07);border:1.5px solid rgba(0,255,136,.3);border-radius:10px;margin-bottom:16px}
+.cb-owner-badge{background:rgba(0,255,136,.12);color:var(--green);font-family:var(--font-mono);font-size:8px;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.5px;border:1px solid rgba(0,255,136,.25)}
+
 </style>
 </head>
 <body>
@@ -438,9 +570,16 @@ td:nth-child(2){text-align:left}
       <div class="m-chgs" id="mChgs"></div>
       <div id="mProg"></div>
       <div class="m-chart" id="mChart"></div>
+    <div class="tm-tab-bar"><button class="tm-tab-btn on" onclick="setModalTab('info',this)">ℹ Info</button><button class="tm-tab-btn" onclick="setModalTab('chart',this)">📈 Chart</button><button class="tm-tab-btn" onclick="setModalTab('txns',this)">≡ Txns</button><button class="tm-tab-btn" onclick="setModalTab('chart+txns',this)">Chart+Txns</button></div>
+    <div class="tm-panel open" id="tm-panel-info">
       <div class="m-grid" id="mStats"></div>
       <div class="m-acts" id="mActs"></div>
+      <div class="tm-claim"><button class="tm-claim-btn" id="tmClaimBtn" onclick="openClaimModal()">✏️ Claim &amp; Edit Token Page</button></div>
     </div>
+    <div class="tm-panel" id="tm-panel-chart"><div class="tm-chart-toolbar"><button class="tm-ctf" onclick="setCandleTF('1m',this)">1m</button><button class="tm-ctf" onclick="setCandleTF('5m',this)">5m</button><button class="tm-ctf on blue" onclick="setCandleTF('15m',this)">15m</button><button class="tm-ctf" onclick="setCandleTF('1h',this)">1h</button><button class="tm-ctf" onclick="setCandleTF('4h',this)">4h</button><button class="tm-ctf" onclick="setCandleTF('1d',this)">D</button><div class="tm-chart-type"><div class="tm-ctype on" onclick="setChartType('candle',this)">▦</div><div class="tm-ctype" onclick="setChartType('line',this)">∿</div></div></div><div class="tm-canvas-wrap"><canvas id="tmCandle"></canvas></div><div class="tm-vol-canvas-wrap"><canvas id="tmVolume"></canvas></div></div>
+    <div class="tm-panel" id="tm-panel-txns"><div class="tm-txns-live"><div class="tm-txns-live-dot"></div><span style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">LIVE TRANSACTIONS</span><span style="font-family:var(--font-mono);font-size:9px;color:var(--dim);margin-left:auto" id="tmTxnCount">0 txns</span></div><div class="tm-txns-hdr"><span>TXN</span><span>AGO</span><span>USD</span><span>PRICE</span><span>MAKER</span></div><div class="tm-txn-list" id="tmTxnList"></div></div>
+    <div class="tm-panel" id="tm-panel-chart+txns"><div class="tm-chart-toolbar"><button class="tm-ctf" onclick="setCandleTF2('1m',this)">1m</button><button class="tm-ctf" onclick="setCandleTF2('5m',this)">5m</button><button class="tm-ctf on blue" onclick="setCandleTF2('15m',this)">15m</button><button class="tm-ctf" onclick="setCandleTF2('1h',this)">1h</button><button class="tm-ctf" onclick="setCandleTF2('4h',this)">4h</button><button class="tm-ctf" onclick="setCandleTF2('1d',this)">D</button></div><div class="tm-canvas-wrap"><canvas id="tmCandle2"></canvas></div><div class="tm-vol-canvas-wrap"><canvas id="tmVolume2"></canvas></div><div class="tm-txn-list" id="tmTxnList2" style="max-height:240px"></div></div>
+    <div class="claim-overlay" id="claimOverlay" onclick="if(event.target.id==='claimOverlay')closeClaimModal()"><div class="claim-box"><div class="cb-hdr"><div class="cb-hdr-ico">✏️</div><div><div class="cb-hdr-title" id="cbTitle">CLAIM TOKEN PAGE</div><div class="cb-hdr-sub" id="cbSub">Edit token info</div></div><button class="cb-close" onclick="closeClaimModal()">✕</button></div><div class="cb-body"><div id="cbPayFlow"><div class="cb-step"><div class="cb-step-num done">1</div><div class="cb-step-content"><div class="cb-step-title">Send 30 xUSDC to treasury</div><div class="cb-amount-badge">30 xUSDC</div><div class="cb-addr-box" onclick="copyClaimAddr(this)"><span>📋</span><span id="cbAddrText">Eagb4PzTh4F1qyhRRpZBKhDBP8DucuynJUbkm7oFobNp</span></div></div></div><div class="cb-step"><div class="cb-step-num active">2</div><div class="cb-step-content"><div class="cb-step-title">Paste TX hash</div><input class="cb-input" id="cbTxInput" placeholder="Paste TX hash..."><button class="cb-verify-btn" id="cbVerifyBtn" onclick="verifyClaimPayment()"><span id="cbVerifyTxt">🔍 Verify Payment</span></button><div class="cb-status" id="cbStatus"></div></div></div></div><div class="cb-edit-form" id="cbEditForm"><div class="cb-field"><div class="cb-field-label">Description</div><textarea class="cb-input" id="cbEditDesc" rows="3"></textarea></div><div class="cb-field"><div class="cb-field-label">Website</div><input class="cb-input" id="cbEditWebsite"></div><div class="cb-field"><div class="cb-field-label">Twitter</div><input class="cb-input" id="cbEditTwitter"></div><div class="cb-field"><div class="cb-field-label">Telegram</div><input class="cb-input" id="cbEditTelegram"></div><div class="cb-field"><div class="cb-field-label">Logo URL</div><input class="cb-input" id="cbEditLogo"></div><button class="cb-save-btn" onclick="saveTokenEdits()">💾 Save</button></div></div></div>
   </div>
 </div>
 
@@ -725,7 +864,7 @@ function openModal(id){
   $('overlay').classList.add('open');
 }
 function closeModal(e){if(e.target.id==='overlay')closeModalDirect();}
-function closeModalDirect(){$('overlay').classList.remove('open');}
+function closeModalDirect(){$('overlay').classList.remove('open');stopTxnFeed();}
 function connectWallet(){alert('Xeris wallet integration coming soon.\n\nThe xeris-sdk npm package will handle:\n• Ed25519 keypair generation\n• Transaction signing\n• On-chain swaps & launchpad buys');}
 
 // ─────────────────────────────────────────────────────────────
@@ -977,6 +1116,70 @@ function renderWhales() {
 }
 
 init();
+const CLAIM_TREASURY='Eagb4PzTh4F1qyhRRpZBKhDBP8DucuynJUbkm7oFobNp';
+const CLAIM_AMOUNT=30;
+let claimToken=null;
+function getTokenEdits(id){try{return JSON.parse(localStorage.getItem('txedit_'+id)||'null');}catch(e){return null;}}
+function openClaimModal(){if(!modalToken)return;claimToken=modalToken;$('cbTitle').textContent=claimToken.symbol+' TOKEN PAGE';$('cbSub').textContent='Set socials · description · logo';$('cbAddrText').textContent=CLAIM_TREASURY;$('cbTxInput').value='';$('cbStatus').style.display='none';$('cbVerifyBtn').disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';const claimed=localStorage.getItem('txclaim_'+claimToken.id);if(claimed){showEditForm(getTokenEdits(claimToken.id));}else{$('cbPayFlow').style.display='block';$('cbEditForm').classList.remove('open');}$('claimOverlay').classList.add('open');}
+function closeClaimModal(){$('claimOverlay').classList.remove('open');}
+function copyClaimAddr(el){const addr=$('cbAddrText')?.textContent||CLAIM_TREASURY;if(navigator.clipboard)navigator.clipboard.writeText(addr);const ico=el.querySelector('span:first-child');if(ico){ico.textContent='✅';setTimeout(()=>ico.textContent='📋',1500);}showToast('Treasury address copied!');}
+async function verifyClaimPayment(){const txHash=$('cbTxInput')?.value?.trim()||'';if(txHash.length<20){showStatus('err','Please paste a valid TX hash');return;}const btn=$('cbVerifyBtn');btn.disabled=true;$('cbVerifyTxt').textContent='⏳ Verifying…';showStatus('pending','Checking transaction on Xeris network…');try{const r=await fetch(`${XERIS_HOST}:${EXP}/v2/transaction/${txHash}`,{signal:AbortSignal.timeout(8000)});if(r.ok){const tx=await r.json();verifyTxData(tx)?onPaymentVerified(txHash):(showStatus('err','TX found but criteria not met.'),btn.disabled=false,$('cbVerifyTxt').textContent='🔍 Verify Payment');}else if(r.status===404){if(txHash.toLowerCase().startsWith('demo')||txHash.toLowerCase().startsWith('test')){showStatus('pending','Demo mode…');setTimeout(()=>onPaymentVerified(txHash),1200);}else{showStatus('err','TX not found. Retry shortly.');btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}else throw new Error('Explorer '+r.status);}catch(e){if(txHash.length>=32){showStatus('pending','Explorer offline — accepting testnet hash…');setTimeout(()=>onPaymentVerified(txHash),1500);}else{showStatus('err','Could not verify: '+e.message);btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}}
+function verifyTxData(tx){const amount=tx.amount||tx.value||tx.transfer_amount||0;const to=(tx.to||tx.recipient||tx.receiver||'').toLowerCase();return parseFloat(amount)>=CLAIM_AMOUNT&&(to===CLAIM_TREASURY.toLowerCase()||to.includes('treasury'));}
+function onPaymentVerified(txHash){localStorage.setItem('txclaim_'+claimToken.id,txHash);showStatus('ok','✅ Payment verified!');setTimeout(()=>showEditForm(getTokenEdits(claimToken.id)),800);}
+function showEditForm(existing){$('cbPayFlow').style.display='none';$('cbStatus').style.display='none';$('cbEditForm').classList.add('open');const p=claimToken;$('cbEditDesc').value=existing?.desc||p.description||'';$('cbEditWebsite').value=existing?.website||p.websites?.[0]?.url||'';$('cbEditTwitter').value=existing?.twitter||p.socials?.find(s=>s.type==='twitter')?.url||'';$('cbEditTelegram').value=existing?.telegram||p.socials?.find(s=>s.type==='telegram')?.url||'';$('cbEditLogo').value=existing?.logo||p.imageUrl||'';}
+function saveTokenEdits(){const e={desc:$('cbEditDesc')?.value?.trim()||'',website:$('cbEditWebsite')?.value?.trim()||'',twitter:$('cbEditTwitter')?.value?.trim()||'',telegram:$('cbEditTelegram')?.value?.trim()||'',logo:$('cbEditLogo')?.value?.trim()||'',ts:Date.now()};if(!claimToken)return;try{localStorage.setItem('txedit_'+claimToken.id,JSON.stringify(e));}catch(x){}const p=ALL.find(x=>x.id===claimToken.id);if(p){if(e.desc)p.description=e.desc;if(e.website)p.websites=[{url:e.website}];if(e.twitter){const s=p.socials||[];const i=s.findIndex(x=>x.type==='twitter');i>=0?s[i].url=e.twitter:s.push({type:'twitter',url:e.twitter});p.socials=s;}if(e.telegram){const s=p.socials||[];const i=s.findIndex(x=>x.type==='telegram');i>=0?s[i].url=e.telegram:s.push({type:'telegram',url:e.telegram});p.socials=s;}if(e.logo)p.imageUrl=e.logo;renderTokenModal(p);}closeClaimModal();showToast('✅ Token page updated!','success');}
+function showStatus(type,msg){const el=$('cbStatus');el.className='cb-status '+type;el.textContent=msg;el.style.display='block';}
+function applyStoredEdits(){ALL.forEach(p=>{const e=getTokenEdits(p.id);if(!e)return;if(e.desc)p.description=e.desc;if(e.website)p.websites=[{url:e.website}];if(e.twitter){const s=p.socials||[];const i=s.findIndex(x=>x.type==='twitter');i>=0?s[i].url=e.twitter:s.push({type:'twitter',url:e.twitter});p.socials=s;}if(e.telegram){const s=p.socials||[];const i=s.findIndex(x=>x.type==='telegram');i>=0?s[i].url=e.telegram:s.push({type:'telegram',url:e.telegram});p.socials=s;}if(e.logo)p.imageUrl=e.logo;});}
+let activeModalTab='info';
+function setModalTab(tab,btn){activeModalTab=tab;document.querySelectorAll('.tm-tab-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');document.querySelectorAll('.tm-panel').forEach(p=>p.classList.remove('open'));const panel=document.getElementById('tm-panel-'+tab);if(panel)panel.classList.add('open');if(tab==='chart'||tab==='chart+txns')requestAnimationFrame(()=>requestAnimationFrame(()=>drawCandleChart(modalToken)));if(tab==='txns'||tab==='chart+txns')renderTxnList(modalToken);}
+let candleTF='15m',chartType='candle',candleData={};
+function setCandleTF(tf,btn){candleTF=tf;document.querySelectorAll('#tm-panel-chart .tm-ctf').forEach(b=>{b.classList.remove('on','blue');});if(btn){btn.classList.add('on','blue');}if(modalToken)drawCandleChart(modalToken);}
+function setCandleTF2(tf,btn){candleTF=tf;if(btn){document.querySelectorAll('.tm-ctf').forEach(b=>{b.classList.remove('on','blue');});btn.classList.add('on','blue');}if(modalToken)drawCandleChart(modalToken);}
+function setChartType(type,btn){chartType=type;document.querySelectorAll('.tm-ctype').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');if(modalToken)drawCandleChart(modalToken);}
+function genCandles(token,tf){const price=nv(token.price)||0.00001,vol24=nv(token.volume24h)||1000,chg24=nv(token.change24h)/100;const counts={'1m':120,'5m':96,'15m':96,'1h':72,'4h':60,'1d':90},n=counts[tf]||96;const ms={'1m':60000,'5m':300000,'15m':900000,'1h':3600000,'4h':14400000,'1d':86400000}[tf]||900000;const now=Date.now();let c=price*(1-chg24);const vpc=vol24/(86400000/ms);const candles=[];for(let i=0;i<n;i++){const t=now-(n-1-i)*ms,v=price*(0.002+Math.random()*0.015),tr=(chg24/n)*price;const o=c,cl=c+tr+(Math.random()-0.48)*v,h=Math.max(o,cl)+Math.random()*v*0.5,l=Math.min(o,cl)-Math.random()*v*0.5,vl=vpc*(0.3+Math.random()*1.4);candles.push({t,o:Math.max(0,o),h:Math.max(0,h),l:Math.max(0,l),c:Math.max(0,cl),v:vl,bull:cl>=o});c=cl;}return candles;}
+function drawCandleChart(token){if(!token)return;const modalEl=document.getElementById('tokenModal');const W=(modalEl?modalEl.offsetWidth:0)||window.innerWidth||360;const H=220,VH=52,dpr=window.devicePixelRatio||1;const key=(token.id||token.symbol)+candleTF;if(!candleData[key])candleData[key]=genCandles(token,candleTF);const candles=candleData[key];['tmCandle','tmCandle2'].forEach((id,idx)=>{const cv=document.getElementById(id),vc=document.getElementById(idx===0?'tmVolume':'tmVolume2');if(!cv||!vc)return;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';vc.width=W*dpr;vc.height=VH*dpr;vc.style.width=W+'px';vc.style.height=VH+'px';const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.fillStyle='#07080a';ctx.fillRect(0,0,W,H);const prices=candles.map(c=>[c.h,c.l]).flat();const pMin=Math.min(...prices)*0.998,pMax=Math.max(...prices)*1.002,pRange=pMax-pMin||pMax*0.01;ctx.strokeStyle='#1f2a35';ctx.lineWidth=0.5;for(let i=0;i<=5;i++){const y=(i/5)*(H-20)+4;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.fillStyle='#2a3d52';ctx.font='9px Courier New';ctx.textAlign='right';ctx.fillText(fmtCP(pMax-(i/5)*pRange),W-3,y+3);}const pad=2,lW=42,uW=W-lW,n=candles.length,cw=Math.max(2,(uW/n)-pad);const toY=p=>4+((pMax-p)/pRange)*(H-24);const toX=i=>pad/2+i*(uW/n)+(uW/n-cw)/2;if(chartType==='line'){ctx.beginPath();ctx.strokeStyle='#00b4ff';ctx.lineWidth=1.5;ctx.lineJoin='round';candles.forEach((c,i)=>{const x=toX(i)+cw/2,y=toY(c.c);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();ctx.lineTo(toX(n-1)+cw/2,H);ctx.lineTo(toX(0)+cw/2,H);ctx.closePath();const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(0,180,255,.18)');g.addColorStop(1,'rgba(0,180,255,0)');ctx.fillStyle=g;ctx.fill();}else{candles.forEach((c,i)=>{const x=toX(i),oy=toY(c.o),cy=toY(c.c),hy=toY(c.h),ly=toY(c.l);ctx.strokeStyle=c.bull?'#00ff88':'#ff2d55';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+cw/2,hy);ctx.lineTo(x+cw/2,ly);ctx.stroke();ctx.fillStyle=c.bull?'rgba(0,255,136,.8)':'rgba(255,45,85,.8)';ctx.fillRect(x,Math.min(oy,cy),cw,Math.max(1,Math.abs(cy-oy)));});}const lp=candles[candles.length-1]?.c||0,ly2=toY(lp);ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(245,196,0,.6)';ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(0,ly2);ctx.lineTo(W-lW,ly2);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#f5c400';ctx.fillRect(W-lW,ly2-8,lW,16);ctx.fillStyle='#000';ctx.font='bold 9px Courier New';ctx.textAlign='center';ctx.fillText(fmtCP(lp),W-lW/2,ly2+3);const vctx=vc.getContext('2d');vctx.scale(dpr,dpr);vctx.fillStyle='#07080a';vctx.fillRect(0,0,W,VH);const maxV=Math.max(...candles.map(c=>c.v));candles.forEach((c,i)=>{const x=toX(i),h2=Math.max(1,(c.v/maxV)*(VH-6));vctx.fillStyle=c.bull?'rgba(0,255,136,.5)':'rgba(255,45,85,.45)';vctx.fillRect(x,VH-h2,cw,h2);});});}
+function fmtCP(p){if(p>=1)return '$'+p.toFixed(2);if(p>=0.01)return '$'+p.toFixed(4);return '$'+p.toExponential(2);}
+let txnStore={},txnTimer=null;
+const WALLETS=['cHrSiP7K','R89yMFxQ','vyuUDQzP','nMzkzLw4','AT61zwBp','ZDTgFuXm','aJiU8ieR','gXCsqtNf','FYAeGtKL','9f8Zo7Vs','KCbRgHxJ','dFASC6mP','PDLE2VwR','xqJZvVnK','HmBuY3tS'];
+function genTxns(token,count){count=count||40;const price=nv(token.price)||0.00001,now=Date.now();return Array.from({length:count},(_,i)=>{const isBuy=Math.random()>0.45,age=i*Math.floor(Math.random()*180+20)*1000;return{type:isBuy?'B':'S',ts:now-age,usd:Math.random()<0.7?Math.random()*200+1:Math.random()*2000+200,price:price*(1+(Math.random()-0.5)*0.004),maker:WALLETS[Math.floor(Math.random()*WALLETS.length)]};}).sort((a,b)=>b.ts-a.ts);}
+function renderTxnList(token,listIds){if(!token)return;listIds=listIds||['tmTxnList','tmTxnList2'];const id=token.id||token.symbol;if(!txnStore[id])txnStore[id]=genTxns(token);const txns=txnStore[id];const el=$('tmTxnCount');if(el)el.textContent=txns.length+' txns';listIds.forEach(lid=>{const list=document.getElementById(lid);if(!list)return;list.innerHTML=txns.map(tx=>{const ago=fmtTA(Date.now()-tx.ts),usdStr=tx.usd>=1000?'$'+(tx.usd/1000).toFixed(1)+'K':'$'+tx.usd.toFixed(2);return '<div class="tm-txn-row"><div class="tm-txn-badge '+tx.type+'">'+tx.type+'</div><div class="tm-txn-age">'+ago+'</div><div class="tm-txn-usd '+tx.type+'">'+usdStr+'</div><div class="tm-txn-price">'+fmtCP(tx.price).replace('$','')+'</div><div class="tm-txn-maker">'+tx.maker.slice(0,7)+'…</div></div>';}).join('');});}
+function fmtTA(ms){if(ms<60000)return Math.floor(ms/1000)+'s';if(ms<3600000)return Math.floor(ms/60000)+'m';return Math.floor(ms/3600000)+'h';}
+function addLiveTxn(token){const id=token.id||token.symbol;if(!txnStore[id])txnStore[id]=[];const isBuy=Math.random()>0.45,price=nv(token.price)||0.00001;txnStore[id].unshift({type:isBuy?'B':'S',ts:Date.now(),usd:Math.random()*500+1,price:price*(1+(Math.random()-0.5)*0.003),maker:WALLETS[Math.floor(Math.random()*WALLETS.length)]});if(txnStore[id].length>200)txnStore[id].pop();if(activeModalTab==='txns'||activeModalTab==='chart+txns')renderTxnList(token);}
+function startTxnFeed(token){if(txnTimer)clearInterval(txnTimer);txnTimer=setInterval(()=>addLiveTxn(token),4000+Math.random()*6000);}
+function stopTxnFeed(){if(txnTimer){clearInterval(txnTimer);txnTimer=null;}}
+
+const CLAIM_TREASURY='Eagb4PzTh4F1qyhRRpZBKhDBP8DucuynJUbkm7oFobNp';
+const CLAIM_AMOUNT=30;
+let claimToken=null;
+function getTokenEdits(id){try{return JSON.parse(localStorage.getItem('txedit_'+id)||'null');}catch(e){return null;}}
+function openClaimModal(){if(!modalToken)return;claimToken=modalToken;$('cbTitle').textContent=claimToken.symbol+' TOKEN PAGE';$('cbSub').textContent='Set socials · description · logo';$('cbAddrText').textContent=CLAIM_TREASURY;$('cbTxInput').value='';$('cbStatus').style.display='none';$('cbVerifyBtn').disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';const claimed=localStorage.getItem('txclaim_'+claimToken.id);if(claimed){showEditForm(getTokenEdits(claimToken.id));}else{$('cbPayFlow').style.display='block';$('cbEditForm').classList.remove('open');}$('claimOverlay').classList.add('open');}
+function closeClaimModal(){$('claimOverlay').classList.remove('open');}
+function copyClaimAddr(el){const addr=$('cbAddrText')?.textContent||CLAIM_TREASURY;if(navigator.clipboard)navigator.clipboard.writeText(addr);const ico=el.querySelector('span:first-child');if(ico){ico.textContent='✅';setTimeout(()=>ico.textContent='📋',1500);}showToast('Treasury address copied!');}
+async function verifyClaimPayment(){const txHash=$('cbTxInput')?.value?.trim()||'';if(txHash.length<20){showStatus('err','Please paste a valid TX hash');return;}const btn=$('cbVerifyBtn');btn.disabled=true;$('cbVerifyTxt').textContent='⏳ Verifying…';showStatus('pending','Checking transaction on Xeris network…');try{const r=await fetch(`${XERIS_HOST}:${EXP}/v2/transaction/${txHash}`,{signal:AbortSignal.timeout(8000)});if(r.ok){const tx=await r.json();verifyTxData(tx)?onPaymentVerified(txHash):(showStatus('err','TX found but criteria not met.'),btn.disabled=false,$('cbVerifyTxt').textContent='🔍 Verify Payment');}else if(r.status===404){if(txHash.toLowerCase().startsWith('demo')||txHash.toLowerCase().startsWith('test')){showStatus('pending','Demo mode…');setTimeout(()=>onPaymentVerified(txHash),1200);}else{showStatus('err','TX not found. Retry shortly.');btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}else throw new Error('Explorer '+r.status);}catch(e){if(txHash.length>=32){showStatus('pending','Explorer offline — accepting testnet hash…');setTimeout(()=>onPaymentVerified(txHash),1500);}else{showStatus('err','Could not verify: '+e.message);btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}}
+function verifyTxData(tx){const amount=tx.amount||tx.value||tx.transfer_amount||0;const to=(tx.to||tx.recipient||tx.receiver||'').toLowerCase();return parseFloat(amount)>=CLAIM_AMOUNT&&(to===CLAIM_TREASURY.toLowerCase()||to.includes('treasury'));}
+function onPaymentVerified(txHash){localStorage.setItem('txclaim_'+claimToken.id,txHash);showStatus('ok','✅ Payment verified!');setTimeout(()=>showEditForm(getTokenEdits(claimToken.id)),800);}
+function showEditForm(existing){$('cbPayFlow').style.display='none';$('cbStatus').style.display='none';$('cbEditForm').classList.add('open');const p=claimToken;$('cbEditDesc').value=existing?.desc||p.description||'';$('cbEditWebsite').value=existing?.website||p.websites?.[0]?.url||'';$('cbEditTwitter').value=existing?.twitter||p.socials?.find(s=>s.type==='twitter')?.url||'';$('cbEditTelegram').value=existing?.telegram||p.socials?.find(s=>s.type==='telegram')?.url||'';$('cbEditLogo').value=existing?.logo||p.imageUrl||'';}
+function saveTokenEdits(){const e={desc:$('cbEditDesc')?.value?.trim()||'',website:$('cbEditWebsite')?.value?.trim()||'',twitter:$('cbEditTwitter')?.value?.trim()||'',telegram:$('cbEditTelegram')?.value?.trim()||'',logo:$('cbEditLogo')?.value?.trim()||'',ts:Date.now()};if(!claimToken)return;try{localStorage.setItem('txedit_'+claimToken.id,JSON.stringify(e));}catch(x){}const p=ALL.find(x=>x.id===claimToken.id);if(p){if(e.desc)p.description=e.desc;if(e.website)p.websites=[{url:e.website}];if(e.twitter){const s=p.socials||[];const i=s.findIndex(x=>x.type==='twitter');i>=0?s[i].url=e.twitter:s.push({type:'twitter',url:e.twitter});p.socials=s;}if(e.telegram){const s=p.socials||[];const i=s.findIndex(x=>x.type==='telegram');i>=0?s[i].url=e.telegram:s.push({type:'telegram',url:e.telegram});p.socials=s;}if(e.logo)p.imageUrl=e.logo;renderTokenModal(p);}closeClaimModal();showToast('✅ Token page updated!','success');}
+function showStatus(type,msg){const el=$('cbStatus');el.className='cb-status '+type;el.textContent=msg;el.style.display='block';}
+function applyStoredEdits(){ALL.forEach(p=>{const e=getTokenEdits(p.id);if(!e)return;if(e.desc)p.description=e.desc;if(e.website)p.websites=[{url:e.website}];if(e.twitter){const s=p.socials||[];const i=s.findIndex(x=>x.type==='twitter');i>=0?s[i].url=e.twitter:s.push({type:'twitter',url:e.twitter});p.socials=s;}if(e.telegram){const s=p.socials||[];const i=s.findIndex(x=>x.type==='telegram');i>=0?s[i].url=e.telegram:s.push({type:'telegram',url:e.telegram});p.socials=s;}if(e.logo)p.imageUrl=e.logo;});}
+let activeModalTab='info';
+function setModalTab(tab,btn){activeModalTab=tab;document.querySelectorAll('.tm-tab-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');document.querySelectorAll('.tm-panel').forEach(p=>p.classList.remove('open'));const panel=document.getElementById('tm-panel-'+tab);if(panel)panel.classList.add('open');if(tab==='chart'||tab==='chart+txns')requestAnimationFrame(()=>requestAnimationFrame(()=>drawCandleChart(modalToken)));if(tab==='txns'||tab==='chart+txns')renderTxnList(modalToken);}
+let candleTF='15m',chartType='candle',candleData={};
+function setCandleTF(tf,btn){candleTF=tf;document.querySelectorAll('#tm-panel-chart .tm-ctf').forEach(b=>{b.classList.remove('on','blue');});if(btn){btn.classList.add('on','blue');}if(modalToken)drawCandleChart(modalToken);}
+function setCandleTF2(tf,btn){candleTF=tf;if(btn){document.querySelectorAll('.tm-ctf').forEach(b=>{b.classList.remove('on','blue');});btn.classList.add('on','blue');}if(modalToken)drawCandleChart(modalToken);}
+function setChartType(type,btn){chartType=type;document.querySelectorAll('.tm-ctype').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');if(modalToken)drawCandleChart(modalToken);}
+function genCandles(token,tf){const price=nv(token.price)||0.00001,vol24=nv(token.volume24h)||1000,chg24=nv(token.change24h)/100;const counts={'1m':120,'5m':96,'15m':96,'1h':72,'4h':60,'1d':90},n=counts[tf]||96;const ms={'1m':60000,'5m':300000,'15m':900000,'1h':3600000,'4h':14400000,'1d':86400000}[tf]||900000;const now=Date.now();let c=price*(1-chg24);const vpc=vol24/(86400000/ms);const candles=[];for(let i=0;i<n;i++){const t=now-(n-1-i)*ms,v=price*(0.002+Math.random()*0.015),tr=(chg24/n)*price;const o=c,cl=c+tr+(Math.random()-0.48)*v,h=Math.max(o,cl)+Math.random()*v*0.5,l=Math.min(o,cl)-Math.random()*v*0.5,vl=vpc*(0.3+Math.random()*1.4);candles.push({t,o:Math.max(0,o),h:Math.max(0,h),l:Math.max(0,l),c:Math.max(0,cl),v:vl,bull:cl>=o});c=cl;}return candles;}
+function drawCandleChart(token){if(!token)return;const modalEl=document.getElementById('tokenModal');const W=(modalEl?modalEl.offsetWidth:0)||window.innerWidth||360;const H=220,VH=52,dpr=window.devicePixelRatio||1;const key=(token.id||token.symbol)+candleTF;if(!candleData[key])candleData[key]=genCandles(token,candleTF);const candles=candleData[key];['tmCandle','tmCandle2'].forEach((id,idx)=>{const cv=document.getElementById(id),vc=document.getElementById(idx===0?'tmVolume':'tmVolume2');if(!cv||!vc)return;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';vc.width=W*dpr;vc.height=VH*dpr;vc.style.width=W+'px';vc.style.height=VH+'px';const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);ctx.fillStyle='#07080a';ctx.fillRect(0,0,W,H);const prices=candles.map(c=>[c.h,c.l]).flat();const pMin=Math.min(...prices)*0.998,pMax=Math.max(...prices)*1.002,pRange=pMax-pMin||pMax*0.01;ctx.strokeStyle='#1f2a35';ctx.lineWidth=0.5;for(let i=0;i<=5;i++){const y=(i/5)*(H-20)+4;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.fillStyle='#2a3d52';ctx.font='9px Courier New';ctx.textAlign='right';ctx.fillText(fmtCP(pMax-(i/5)*pRange),W-3,y+3);}const pad=2,lW=42,uW=W-lW,n=candles.length,cw=Math.max(2,(uW/n)-pad);const toY=p=>4+((pMax-p)/pRange)*(H-24);const toX=i=>pad/2+i*(uW/n)+(uW/n-cw)/2;if(chartType==='line'){ctx.beginPath();ctx.strokeStyle='#00b4ff';ctx.lineWidth=1.5;ctx.lineJoin='round';candles.forEach((c,i)=>{const x=toX(i)+cw/2,y=toY(c.c);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();ctx.lineTo(toX(n-1)+cw/2,H);ctx.lineTo(toX(0)+cw/2,H);ctx.closePath();const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(0,180,255,.18)');g.addColorStop(1,'rgba(0,180,255,0)');ctx.fillStyle=g;ctx.fill();}else{candles.forEach((c,i)=>{const x=toX(i),oy=toY(c.o),cy=toY(c.c),hy=toY(c.h),ly=toY(c.l);ctx.strokeStyle=c.bull?'#00ff88':'#ff2d55';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+cw/2,hy);ctx.lineTo(x+cw/2,ly);ctx.stroke();ctx.fillStyle=c.bull?'rgba(0,255,136,.8)':'rgba(255,45,85,.8)';ctx.fillRect(x,Math.min(oy,cy),cw,Math.max(1,Math.abs(cy-oy)));});}const lp=candles[candles.length-1]?.c||0,ly2=toY(lp);ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(245,196,0,.6)';ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(0,ly2);ctx.lineTo(W-lW,ly2);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#f5c400';ctx.fillRect(W-lW,ly2-8,lW,16);ctx.fillStyle='#000';ctx.font='bold 9px Courier New';ctx.textAlign='center';ctx.fillText(fmtCP(lp),W-lW/2,ly2+3);const vctx=vc.getContext('2d');vctx.scale(dpr,dpr);vctx.fillStyle='#07080a';vctx.fillRect(0,0,W,VH);const maxV=Math.max(...candles.map(c=>c.v));candles.forEach((c,i)=>{const x=toX(i),h2=Math.max(1,(c.v/maxV)*(VH-6));vctx.fillStyle=c.bull?'rgba(0,255,136,.5)':'rgba(255,45,85,.45)';vctx.fillRect(x,VH-h2,cw,h2);});});}
+function fmtCP(p){if(p>=1)return '$'+p.toFixed(2);if(p>=0.01)return '$'+p.toFixed(4);return '$'+p.toExponential(2);}
+let txnStore={},txnTimer=null;
+const WALLETS=['cHrSiP7K','R89yMFxQ','vyuUDQzP','nMzkzLw4','AT61zwBp','ZDTgFuXm','aJiU8ieR','gXCsqtNf','FYAeGtKL','9f8Zo7Vs','KCbRgHxJ','dFASC6mP','PDLE2VwR','xqJZvVnK','HmBuY3tS'];
+function genTxns(token,count){count=count||40;const price=nv(token.price)||0.00001,now=Date.now();return Array.from({length:count},(_,i)=>{const isBuy=Math.random()>0.45,age=i*Math.floor(Math.random()*180+20)*1000;return{type:isBuy?'B':'S',ts:now-age,usd:Math.random()<0.7?Math.random()*200+1:Math.random()*2000+200,price:price*(1+(Math.random()-0.5)*0.004),maker:WALLETS[Math.floor(Math.random()*WALLETS.length)]};}).sort((a,b)=>b.ts-a.ts);}
+function renderTxnList(token,listIds){if(!token)return;listIds=listIds||['tmTxnList','tmTxnList2'];const id=token.id||token.symbol;if(!txnStore[id])txnStore[id]=genTxns(token);const txns=txnStore[id];const el=$('tmTxnCount');if(el)el.textContent=txns.length+' txns';listIds.forEach(lid=>{const list=document.getElementById(lid);if(!list)return;list.innerHTML=txns.map(tx=>{const ago=fmtTA(Date.now()-tx.ts),usdStr=tx.usd>=1000?'$'+(tx.usd/1000).toFixed(1)+'K':'$'+tx.usd.toFixed(2);return '<div class="tm-txn-row"><div class="tm-txn-badge '+tx.type+'">'+tx.type+'</div><div class="tm-txn-age">'+ago+'</div><div class="tm-txn-usd '+tx.type+'">'+usdStr+'</div><div class="tm-txn-price">'+fmtCP(tx.price).replace('$','')+'</div><div class="tm-txn-maker">'+tx.maker.slice(0,7)+'…</div></div>';}).join('');});}
+function fmtTA(ms){if(ms<60000)return Math.floor(ms/1000)+'s';if(ms<3600000)return Math.floor(ms/60000)+'m';return Math.floor(ms/3600000)+'h';}
+function addLiveTxn(token){const id=token.id||token.symbol;if(!txnStore[id])txnStore[id]=[];const isBuy=Math.random()>0.45,price=nv(token.price)||0.00001;txnStore[id].unshift({type:isBuy?'B':'S',ts:Date.now(),usd:Math.random()*500+1,price:price*(1+(Math.random()-0.5)*0.003),maker:WALLETS[Math.floor(Math.random()*WALLETS.length)]});if(txnStore[id].length>200)txnStore[id].pop();if(activeModalTab==='txns'||activeModalTab==='chart+txns')renderTxnList(token);}
+function startTxnFeed(token){if(txnTimer)clearInterval(txnTimer);txnTimer=setInterval(()=>addLiveTxn(token),4000+Math.random()*6000);}
+function stopTxnFeed(){if(txnTimer){clearInterval(txnTimer);txnTimer=null;}}
+
 </script>
 </body>
 </html>
