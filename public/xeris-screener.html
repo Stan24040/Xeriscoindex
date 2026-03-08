@@ -592,6 +592,16 @@ const XERIS_HOST = _IS_LOCAL ? 'http://138.197.116.81' : '';
 const RPC = 56001; const EXP = 50008;
 function _rpc(p){return _IS_LOCAL?`http://138.197.116.81:56001/${p}`:`/api/proxy/rpc/${p}`;}
 function _exp(p){return _IS_LOCAL?`http://138.197.116.81:50008/${p}`:`/api/proxy/exp/${p}`;}
+if(!_IS_LOCAL){
+  const _oF=window.fetch;
+  window.fetch=function(u,o){
+    if(typeof u==='string'){
+      u=u.replace('http://138.197.116.81:56001/','/api/proxy/rpc/');
+      u=u.replace('http://138.197.116.81:50008/','/api/proxy/exp/');
+    }
+    return _oF(u,o);
+  };
+}
 const BACK = (location.protocol==='file:') ? null : location.origin;
 
 // ─────────────────────────────────────────────────────────────
