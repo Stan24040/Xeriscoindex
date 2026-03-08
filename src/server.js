@@ -81,6 +81,27 @@ app.use('/api/', apiLimiter);
 
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 // Serve all static assets except index.html (we inject env vars into that)
+
+app.get('/api/proxy/rpc/*', async (req, res) => {
+  const path = req.params[0] || '';
+  const qs = new URLSearchParams(req.query).toString();
+  const url = `http://138.197.116.81:56001/${path}${qs ? '?' + qs : ''}`;
+  try {
+    const r = await fetch(url, {signal: AbortSignal.timeout(6000)});
+    const data = await r.json();
+    res.json(data);
+  } catch(e) { res.status(502).json({error: e.message}); }
+});
+app.get('/api/proxy/exp/*', async (req, res) => {
+  const path = req.params[0] || '';
+  const qs = new URLSearchParams(req.query).toString();
+  const url = `http://138.197.116.81:50008/${path}${qs ? '?' + qs : ''}`;
+  try {
+    const r = await fetch(url, {signal: AbortSignal.timeout(6000)});
+    const data = await r.json();
+    res.json(data);
+  } catch(e) { res.status(502).json({error: e.message}); }
+});
 app.use(express.static(path.join(__dirname, '../public'), {
   maxAge: IS_PROD ? '1h' : 0,
   etag: true,
@@ -383,10 +404,6 @@ process.on('unhandledRejection', (err) => console.error('unhandledRejection:', e
   const startupTimeout = setTimeout(() => {
     console.warn('[Store] Startup taking long — proceeding anyway');
   }, 8000);
-
-  try { await store.startPriceEngine(); }
-  catch(err) { console.error('[Store] Engine error:', err.message); }
-  finally { clearTimeout(startupTimeout); }
 
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`\nReady on port ${PORT}`);

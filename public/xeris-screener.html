@@ -587,9 +587,11 @@ td:nth-child(2){text-align:left}
 // ─────────────────────────────────────────────────────────────
 // CONFIG
 // ─────────────────────────────────────────────────────────────
-const XERIS_HOST = 'http://138.197.116.81';
-const RPC  = 56001;
-const EXP  = 50008;
+const _IS_LOCAL = ['localhost','127.0.0.1'].includes(window.location.hostname);
+const XERIS_HOST = _IS_LOCAL ? 'http://138.197.116.81' : '';
+const RPC = 56001; const EXP = 50008;
+function _rpc(p){return _IS_LOCAL?`http://138.197.116.81:56001/${p}`:`/api/proxy/rpc/${p}`;}
+function _exp(p){return _IS_LOCAL?`http://138.197.116.81:50008/${p}`:`/api/proxy/exp/${p}`;}
 const BACK = (location.protocol==='file:') ? null : location.origin;
 
 // ─────────────────────────────────────────────────────────────
@@ -858,7 +860,7 @@ function openModal(id){
     {l:'Buys',v:`<span class="up">${nv(p.buys)}</span>`},{l:'Sells',v:`<span class="dn">${nv(p.sells)}</span>`},
   ].map(s=>`<div class="m-stat"><div class="ms-lbl">${s.l}</div><div class="ms-val">${s.v}</div></div>`).join('');
 
-  const expUrl=isX?`${XERIS_HOST}:${EXP}/v2/tx/${p.id}`:(p.url||`https://dexscreener.com/solana/${p.id}`);
+  const expUrl=isX?`${_exp('v2/tx/${p.id}')`:(p.url||`https://dexscreener.com/solana/${p.id}`);
   $('mActs').innerHTML=`<button class="m-btn primary" onclick="window.open('${expUrl}','_blank')">View on Explorer</button><button class="m-btn" onclick="window.open('${p.url||expUrl}','_blank')">Trade</button><button class="m-btn" onclick="closeModalDirect()">✕ Close</button>`;
 
   $('overlay').classList.add('open');
@@ -887,14 +889,14 @@ function connectWallet(){
 // ─────────────────────────────────────────────────────────────
 async function fetchXerisLaunchpad(){
   try{
-    const r=await fetch(`${XERIS_HOST}:${RPC}/launchpads`,{signal:AbortSignal.timeout(8000)});
+    const r=await fetch(`${_rpc('launchpads')`,{signal:AbortSignal.timeout(8000)});
     const d=await r.json();
     return(Array.isArray(d)?d:(d.launchpads||d.data||[])).map(normLaunch);
   }catch(e){console.warn('[XRS] launchpad:',e.message);return[];}
 }
 async function fetchXerisSwaps(){
   try{
-    const r=await fetch(`${XERIS_HOST}:${RPC}/contracts`,{signal:AbortSignal.timeout(8000)});
+    const r=await fetch(`${_rpc('contracts')`,{signal:AbortSignal.timeout(8000)});
     const d=await r.json();
     const all=Array.isArray(d)?d:(d.contracts||d.data||[]);
     return all.filter(c=>(c.contract_type||c.type)==='swap').map(normSwap);
@@ -902,14 +904,14 @@ async function fetchXerisSwaps(){
 }
 async function fetchXerisTokens(){
   try{
-    const r=await fetch(`${XERIS_HOST}:${EXP}/v2/tokens`,{signal:AbortSignal.timeout(8000)});
+    const r=await fetch(`${_exp('v2/tokens')`,{signal:AbortSignal.timeout(8000)});
     const d=await r.json();
     return(Array.isArray(d)?d:(d.tokens||d.data||[])).map(normToken);
   }catch(e){return[];}
 }
 async function fetchXerisRecentTxs(){
   try{
-    const r=await fetch(`${XERIS_HOST}:${EXP}/v2/transactions?page=1&page_size=20`,{signal:AbortSignal.timeout(6000)});
+    const r=await fetch(`${_exp('v2/transactions?page=1&page_size=20')`,{signal:AbortSignal.timeout(6000)});
     const d=await r.json();
     return Array.isArray(d)?d:(d.transactions||d.data||[]);
   }catch(e){return[];}
@@ -927,7 +929,7 @@ function normLaunch(p,i){
   const sym=p.symbol||p.token_symbol||'???';
   return{id:p.contract_id||p.id||'l'+i,rank:i+1,symbol:sym,name:p.name||p.token_name||sym,
     chain:'xeris',dex:'XerisLaunch',source:'xeris-launchpad',
-    url:`${XERIS_HOST}:${EXP}`,tokenAddress:p.token_id||'',
+    url:`${_exp("")}`,tokenAddress:p.token_id||'',
     price:nv(p.current_price),priceUsd:nv(p.current_price),
     change1h:nv(p.change_1h),change6h:nv(p.change_6h),change24h:nv(p.change_24h),
     volume24h:nv(p.volume_24h||p.volume),liquidity:nv(p.liquidity),
@@ -941,7 +943,7 @@ function normSwap(c,i){
   const sym=symA==='xrs_native'?symB:symA;
   const rA=nv(st.reserve_a||st.amount_a),rB=nv(st.reserve_b||st.amount_b);
   return{id:c.contract_id||c.id||'s'+i,rank:0,symbol:sym,name:st.name||`${sym}/XRS Pool`,
-    chain:'xeris',dex:'XerisSwap',source:'xeris-swap',url:`${XERIS_HOST}:${EXP}`,tokenAddress:st.token_a||'',
+    chain:'xeris',dex:'XerisSwap',source:'xeris-swap',url:`${_exp("")}`,tokenAddress:st.token_a||'',
     price:rA>0?rB/rA:0,priceUsd:rA>0?rB/rA:0,
     change1h:0,change6h:0,change24h:nv(st.change_24h),
     volume24h:nv(st.volume_24h),liquidity:(rB/1e9)*2,
@@ -951,7 +953,7 @@ function normSwap(c,i){
 function normToken(t,i){
   const sym=t.symbol||'???';
   return{id:t.token_id||t.id||sym,rank:0,symbol:sym,name:t.name||sym,
-    chain:'xeris',dex:'XerisChain',source:'xeris-registry',url:`${XERIS_HOST}:${EXP}`,tokenAddress:t.token_id||'',
+    chain:'xeris',dex:'XerisChain',source:'xeris-registry',url:`${_exp("")}`,tokenAddress:t.token_id||'',
     price:0,priceUsd:0,change1h:0,change6h:0,change24h:0,
     volume24h:0,liquidity:0,marketCap:nv(t.market_cap),
     buys:0,sells:0,txns24h:0,launchedAt:t.created_at||Date.now(),launchProgress:0,sparkline:[]};
@@ -1138,7 +1140,7 @@ function getTokenEdits(id){try{return JSON.parse(localStorage.getItem('txedit_'+
 function openClaimModal(){if(!modalToken)return;claimToken=modalToken;$('cbTitle').textContent=claimToken.symbol+' TOKEN PAGE';$('cbSub').textContent='Set socials · description · logo';$('cbAddrText').textContent=CLAIM_TREASURY;$('cbTxInput').value='';$('cbStatus').style.display='none';$('cbVerifyBtn').disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';const claimed=localStorage.getItem('txclaim_'+claimToken.id);if(claimed){showEditForm(getTokenEdits(claimToken.id));}else{$('cbPayFlow').style.display='block';$('cbEditForm').classList.remove('open');}$('claimOverlay').classList.add('open');}
 function closeClaimModal(){$('claimOverlay').classList.remove('open');}
 function copyClaimAddr(el){const addr=$('cbAddrText')?.textContent||CLAIM_TREASURY;if(navigator.clipboard)navigator.clipboard.writeText(addr);const ico=el.querySelector('span:first-child');if(ico){ico.textContent='✅';setTimeout(()=>ico.textContent='📋',1500);}showToast('Treasury address copied!');}
-async function verifyClaimPayment(){const txHash=$('cbTxInput')?.value?.trim()||'';if(txHash.length<20){showStatus('err','Please paste a valid TX hash');return;}const btn=$('cbVerifyBtn');btn.disabled=true;$('cbVerifyTxt').textContent='⏳ Verifying…';showStatus('pending','Checking transaction on Xeris network…');try{const r=await fetch(`${XERIS_HOST}:${EXP}/v2/transaction/${txHash}`,{signal:AbortSignal.timeout(8000)});if(r.ok){const tx=await r.json();verifyTxData(tx)?onPaymentVerified(txHash):(showStatus('err','TX found but criteria not met.'),btn.disabled=false,$('cbVerifyTxt').textContent='🔍 Verify Payment');}else if(r.status===404){if(txHash.toLowerCase().startsWith('demo')||txHash.toLowerCase().startsWith('test')){showStatus('pending','Demo mode…');setTimeout(()=>onPaymentVerified(txHash),1200);}else{showStatus('err','TX not found. Retry shortly.');btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}else throw new Error('Explorer '+r.status);}catch(e){if(txHash.length>=32){showStatus('pending','Explorer offline — accepting testnet hash…');setTimeout(()=>onPaymentVerified(txHash),1500);}else{showStatus('err','Could not verify: '+e.message);btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}}
+async function verifyClaimPayment(){const txHash=$('cbTxInput')?.value?.trim()||'';if(txHash.length<20){showStatus('err','Please paste a valid TX hash');return;}const btn=$('cbVerifyBtn');btn.disabled=true;$('cbVerifyTxt').textContent='⏳ Verifying…';showStatus('pending','Checking transaction on Xeris network…');try{const r=await fetch(`${_exp('v2/transaction/${txHash}')`,{signal:AbortSignal.timeout(8000)});if(r.ok){const tx=await r.json();verifyTxData(tx)?onPaymentVerified(txHash):(showStatus('err','TX found but criteria not met.'),btn.disabled=false,$('cbVerifyTxt').textContent='🔍 Verify Payment');}else if(r.status===404){if(txHash.toLowerCase().startsWith('demo')||txHash.toLowerCase().startsWith('test')){showStatus('pending','Demo mode…');setTimeout(()=>onPaymentVerified(txHash),1200);}else{showStatus('err','TX not found. Retry shortly.');btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}else throw new Error('Explorer '+r.status);}catch(e){if(txHash.length>=32){showStatus('pending','Explorer offline — accepting testnet hash…');setTimeout(()=>onPaymentVerified(txHash),1500);}else{showStatus('err','Could not verify: '+e.message);btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}}
 function verifyTxData(tx){const amount=tx.amount||tx.value||tx.transfer_amount||0;const to=(tx.to||tx.recipient||tx.receiver||'').toLowerCase();return parseFloat(amount)>=CLAIM_AMOUNT&&(to===CLAIM_TREASURY.toLowerCase()||to.includes('treasury'));}
 function onPaymentVerified(txHash){localStorage.setItem('txclaim_'+claimToken.id,txHash);showStatus('ok','✅ Payment verified!');setTimeout(()=>showEditForm(getTokenEdits(claimToken.id)),800);}
 function showEditForm(existing){$('cbPayFlow').style.display='none';$('cbStatus').style.display='none';$('cbEditForm').classList.add('open');const p=claimToken;$('cbEditDesc').value=existing?.desc||p.description||'';$('cbEditWebsite').value=existing?.website||p.websites?.[0]?.url||'';$('cbEditTwitter').value=existing?.twitter||p.socials?.find(s=>s.type==='twitter')?.url||'';$('cbEditTelegram').value=existing?.telegram||p.socials?.find(s=>s.type==='telegram')?.url||'';$('cbEditLogo').value=existing?.logo||p.imageUrl||'';}
@@ -1170,7 +1172,7 @@ function getTokenEdits(id){try{return JSON.parse(localStorage.getItem('txedit_'+
 function openClaimModal(){if(!modalToken)return;claimToken=modalToken;$('cbTitle').textContent=claimToken.symbol+' TOKEN PAGE';$('cbSub').textContent='Set socials · description · logo';$('cbAddrText').textContent=CLAIM_TREASURY;$('cbTxInput').value='';$('cbStatus').style.display='none';$('cbVerifyBtn').disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';const claimed=localStorage.getItem('txclaim_'+claimToken.id);if(claimed){showEditForm(getTokenEdits(claimToken.id));}else{$('cbPayFlow').style.display='block';$('cbEditForm').classList.remove('open');}$('claimOverlay').classList.add('open');}
 function closeClaimModal(){$('claimOverlay').classList.remove('open');}
 function copyClaimAddr(el){const addr=$('cbAddrText')?.textContent||CLAIM_TREASURY;if(navigator.clipboard)navigator.clipboard.writeText(addr);const ico=el.querySelector('span:first-child');if(ico){ico.textContent='✅';setTimeout(()=>ico.textContent='📋',1500);}showToast('Treasury address copied!');}
-async function verifyClaimPayment(){const txHash=$('cbTxInput')?.value?.trim()||'';if(txHash.length<20){showStatus('err','Please paste a valid TX hash');return;}const btn=$('cbVerifyBtn');btn.disabled=true;$('cbVerifyTxt').textContent='⏳ Verifying…';showStatus('pending','Checking transaction on Xeris network…');try{const r=await fetch(`${XERIS_HOST}:${EXP}/v2/transaction/${txHash}`,{signal:AbortSignal.timeout(8000)});if(r.ok){const tx=await r.json();verifyTxData(tx)?onPaymentVerified(txHash):(showStatus('err','TX found but criteria not met.'),btn.disabled=false,$('cbVerifyTxt').textContent='🔍 Verify Payment');}else if(r.status===404){if(txHash.toLowerCase().startsWith('demo')||txHash.toLowerCase().startsWith('test')){showStatus('pending','Demo mode…');setTimeout(()=>onPaymentVerified(txHash),1200);}else{showStatus('err','TX not found. Retry shortly.');btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}else throw new Error('Explorer '+r.status);}catch(e){if(txHash.length>=32){showStatus('pending','Explorer offline — accepting testnet hash…');setTimeout(()=>onPaymentVerified(txHash),1500);}else{showStatus('err','Could not verify: '+e.message);btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}}
+async function verifyClaimPayment(){const txHash=$('cbTxInput')?.value?.trim()||'';if(txHash.length<20){showStatus('err','Please paste a valid TX hash');return;}const btn=$('cbVerifyBtn');btn.disabled=true;$('cbVerifyTxt').textContent='⏳ Verifying…';showStatus('pending','Checking transaction on Xeris network…');try{const r=await fetch(`${_exp('v2/transaction/${txHash}')`,{signal:AbortSignal.timeout(8000)});if(r.ok){const tx=await r.json();verifyTxData(tx)?onPaymentVerified(txHash):(showStatus('err','TX found but criteria not met.'),btn.disabled=false,$('cbVerifyTxt').textContent='🔍 Verify Payment');}else if(r.status===404){if(txHash.toLowerCase().startsWith('demo')||txHash.toLowerCase().startsWith('test')){showStatus('pending','Demo mode…');setTimeout(()=>onPaymentVerified(txHash),1200);}else{showStatus('err','TX not found. Retry shortly.');btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}else throw new Error('Explorer '+r.status);}catch(e){if(txHash.length>=32){showStatus('pending','Explorer offline — accepting testnet hash…');setTimeout(()=>onPaymentVerified(txHash),1500);}else{showStatus('err','Could not verify: '+e.message);btn.disabled=false;$('cbVerifyTxt').textContent='🔍 Verify Payment';}}}
 function verifyTxData(tx){const amount=tx.amount||tx.value||tx.transfer_amount||0;const to=(tx.to||tx.recipient||tx.receiver||'').toLowerCase();return parseFloat(amount)>=CLAIM_AMOUNT&&(to===CLAIM_TREASURY.toLowerCase()||to.includes('treasury'));}
 function onPaymentVerified(txHash){localStorage.setItem('txclaim_'+claimToken.id,txHash);showStatus('ok','✅ Payment verified!');setTimeout(()=>showEditForm(getTokenEdits(claimToken.id)),800);}
 function showEditForm(existing){$('cbPayFlow').style.display='none';$('cbStatus').style.display='none';$('cbEditForm').classList.add('open');const p=claimToken;$('cbEditDesc').value=existing?.desc||p.description||'';$('cbEditWebsite').value=existing?.website||p.websites?.[0]?.url||'';$('cbEditTwitter').value=existing?.twitter||p.socials?.find(s=>s.type==='twitter')?.url||'';$('cbEditTelegram').value=existing?.telegram||p.socials?.find(s=>s.type==='telegram')?.url||'';$('cbEditLogo').value=existing?.logo||p.imageUrl||'';}
