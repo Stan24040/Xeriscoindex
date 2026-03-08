@@ -865,7 +865,22 @@ function openModal(id){
 }
 function closeModal(e){if(e.target.id==='overlay')closeModalDirect();}
 function closeModalDirect(){$('overlay').classList.remove('open');stopTxnFeed();}
-function connectWallet(){alert('Xeris wallet integration coming soon.\n\nThe xeris-sdk npm package will handle:\n• Ed25519 keypair generation\n• Transaction signing\n• On-chain swaps & launchpad buys');}
+function connectWallet(){
+  var btn=document.querySelector('.wallet-btn');
+  if(window.xeris){
+    window.xeris.connect().then(function(acc){
+      var addr=acc.address||acc.publicKey||String(acc);
+      var s=addr.slice(0,6)+'...'+addr.slice(-4);
+      if(btn){btn.textContent=s;btn.style.background='#22c55e';}
+      window._walletAddress=addr;
+    }).catch(function(e){alert('Wallet error: '+e.message);});
+  } else {
+    var m=document.createElement('div');
+    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    m.innerHTML='<div style="background:#1a1a2e;border:1px solid #f0b90b;border-radius:12px;padding:28px;max-width:320px;text-align:center"><div style="font-size:40px">&#x2B21;</div><div style="color:#f0b90b;font-weight:700;margin:12px 0">Xeris Wallet Not Found</div><div style="color:#aaa;font-size:13px;margin-bottom:16px">Open this page inside the<br><span style="color:#f0b90b">Xeris Wallet Browser</span></div><div style="background:#111;border-radius:8px;padding:12px;font-size:12px;color:#888;text-align:left;margin-bottom:16px"><div style="color:#f0b90b;margin-bottom:6px">HOW TO CONNECT</div>1. Open Xeris Wallet app<br>2. Tap <b style="color:#fff">Browser</b> tab<br>3. Navigate to this URL<br>4. Tap <b style="color:#fff">Connect Wallet</b></div><button onclick="this.closest('[style*=fixed]').remove()" style="background:#f0b90b;color:#000;border:none;border-radius:8px;padding:10px 24px;font-weight:700;cursor:pointer;width:100%">Got it</button></div>';
+    document.body.appendChild(m);
+  }
+}
 
 // ─────────────────────────────────────────────────────────────
 // DATA — XERIS TESTNET
